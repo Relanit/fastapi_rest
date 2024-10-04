@@ -1,0 +1,6 @@
+fastapi[all]
+sqlalchemy
+alembic
+psycopg2
+asyncpg
+fastapi-users[sqlalchemy]
