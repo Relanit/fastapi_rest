@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
     DB_URL: str
+    TEST_DB_URL: str
     SECRET: str
 
 

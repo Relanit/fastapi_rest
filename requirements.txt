@@ -1,4 +1,5 @@
 fastapi[all]
+fastapi-cache2[redis]
 sqlalchemy
 alembic
 psycopg2

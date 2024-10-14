@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,9 +11,20 @@ router = APIRouter(prefix="/authors", tags=["Author"])
 
 @router.get("/")
 async def get_specific_authors(name: str, session: AsyncSession = Depends(get_async_session)):
-    query = select(Author).where(Author.name == name)
-    result = await session.execute(query)
-    return result.mappings().all()
+    try:
+        query = select(Author).where(Author.name == name)
+        result = await session.execute(query)
+        return {
+            "status": "success",
+            "data": result.mappings().all(),
+            "details": None
+        }
+    except Exception:
+        raise HTTPException(status_code=500, detail={
+            "status": "error",
+            "data": None,
+            "details": None
+        })
 
 
 @router.post("/")

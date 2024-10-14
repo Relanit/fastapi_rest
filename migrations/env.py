@@ -13,7 +13,7 @@ from src.authors.models import *
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "DB_URL", cfg.DB_URL.replace("+asyncpg", ""))
+config.set_section_option(section, "DB_URL", cfg.DB_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
