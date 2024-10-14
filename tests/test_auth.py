@@ -1,4 +1,3 @@
-import pytest
 from httpx import AsyncClient
 from sqlalchemy import insert, select
 
@@ -6,7 +5,6 @@ from src.auth.models import Role
 from tests.conftest import async_session_maker
 
 
-@pytest.mark.asyncio(loop_scope="session")
 async def test_add_role():
     async with async_session_maker() as session:
         stmt = insert(Role).values(id=1, name="admin", permissions=None)
@@ -21,7 +19,6 @@ async def test_add_role():
         assert expected_role == result_role
 
 
-@pytest.mark.asyncio(loop_scope="session")
 async def test_register(ac: AsyncClient):
     response = await ac.post(
         "/auth/register",
