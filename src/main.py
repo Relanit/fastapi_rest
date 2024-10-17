@@ -1,15 +1,21 @@
+import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+import uvicorn
+from fastapi import FastAPI, Depends
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi.middleware.cors import CORSMiddleware
 from redis import asyncio as aioredis
+from fastapi.staticfiles import StaticFiles
 
-from src.auth.auth import auth_backend, fastapi_users
-from src.auth.schemas import UserRead, UserCreate
-from src.authors.router import router as router_books
+from auth.auth import auth_backend, fastapi_users, current_user
+from auth.models import User
+from auth.schemas import UserRead, UserCreate
+from authors.router import router as router_books
+from database import get_async_session
+from pages.router import router as router_pages
 
 
 @asynccontextmanager
@@ -20,6 +26,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Library app", lifespan=lifespan)
+
+app.mount("/static", StaticFiles(directory="static" if "uvicorn" in sys.argv[0] else "src/static"), name="static")
 
 
 origins = ["http://localhost:3000"]
@@ -39,6 +47,19 @@ app.add_middleware(
 )
 
 
+@app.get("/user", tags=["User"])
+def get_current_user(user: User = Depends(current_user)):
+    return UserRead(
+        id=user.id,
+        email=user.email,
+        username=user.username,
+        role_id=user.role_id,
+        is_active=user.is_active,
+        is_superuser=user.is_superuser,
+        is_verified=user.is_verified,
+    )
+
+
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
     prefix="/auth/jwt",
@@ -52,3 +73,4 @@ app.include_router(
 )
 
 app.include_router(router_books)
+app.include_router(router_pages)

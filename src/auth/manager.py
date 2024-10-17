@@ -2,18 +2,42 @@ from typing import Optional
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin, schemas, models, exceptions
+from fastapi_users.db import BaseUserDatabase
+from fastapi_users.password import PasswordHelperProtocol, PasswordHelper
+from sqlalchemy import update
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.config import config
-from src.auth.models import User
-from src.auth.utils import get_user_db
+from config import config
+from auth.models import User
+from auth.utils import get_user_db
+from database import get_async_session
+
+
+async def get_session() -> AsyncSession:
+    async with get_async_session() as session:
+        yield
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = config.SECRET
     verification_token_secret = config.SECRET
 
+    def __init__(
+        self,
+        user_db: BaseUserDatabase[models.UP, models.ID],
+        session: AsyncSession,
+        password_helper: Optional[PasswordHelperProtocol] = None,
+    ):
+        super().__init__(user_db, password_helper)
+        self.session = session
+
     async def on_after_register(self, user: User, request: Optional[Request] = None):
         print(f"User {user.id} has registered.")
+        if user.id == 1:
+            stmt = update(User).where(User.id == 1).values(role_id=2, is_superuser=True)
+            await self.session.execute(stmt)
+            await self.session.commit()
+            print("Added admin")
 
     async def create(
         self,
@@ -40,11 +64,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         if existing_user is not None:
             raise exceptions.UserAlreadyExists()
 
-        user_dict = (
-            user_create.create_update_dict()
-            if safe
-            else user_create.create_update_dict_superuser()
-        )
+        user_dict = user_create.create_update_dict() if safe else user_create.create_update_dict_superuser()
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
         user_dict["role_id"] = 1
@@ -56,5 +76,5 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         return created_user
 
 
-async def get_user_manager(user_db=Depends(get_user_db)):
-    yield UserManager(user_db)
+async def get_user_manager(user_db=Depends(get_user_db), session=Depends(get_async_session)):
+    yield UserManager(user_db, session)

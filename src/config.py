@@ -1,3 +1,5 @@
+import sys
+
 from pydantic_settings import BaseSettings
 
 
@@ -7,4 +9,4 @@ class Config(BaseSettings):
     SECRET: str
 
 
-config = Config(_env_file=".env")
+config = Config(_env_file="./../.env" if "uvicorn" in sys.argv[0] else "./.env")

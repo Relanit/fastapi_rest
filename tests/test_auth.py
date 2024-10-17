@@ -1,20 +1,22 @@
 from httpx import AsyncClient
 from sqlalchemy import insert, select
 
-from src.auth.models import Role
+from auth.models import Role
 from tests.conftest import async_session_maker
 
 
 async def test_add_role():
     async with async_session_maker() as session:
-        stmt = insert(Role).values(id=1, name="admin", permissions=None)
+        stmt = insert(Role).values(id=1, name="user", permissions=None)
+        await session.execute(stmt)
+        stmt = insert(Role).values(id=2, name="admin", permissions=None)
         await session.execute(stmt)
         await session.commit()
 
         query = select(Role)
         result = await session.execute(query)
         role = result.first()[0]
-        expected_role = {"id": 1, "name": "admin", "permissions": None}
+        expected_role = {"id": 1, "name": "user", "permissions": None}
         result_role = {"id": role.id, "name": role.name, "permissions": role.permissions}
         assert expected_role == result_role
 

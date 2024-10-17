@@ -4,15 +4,17 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
-from src.config import config as cfg
-from src.auth.models import *
-from src.authors.models import *
+from config import Config
+from auth.models import *
+from authors.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 section = config.config_ini_section
+
+cfg = Config(_env_file="./.env")
 config.set_section_option(section, "DB_URL", cfg.DB_URL)
 
 # Interpret the config file for Python logging.

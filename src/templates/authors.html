@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script>
+    const addAuthor = async () => {
+        event.preventDefault();
+
+        const form = document.getElementById("author_form");
+        const formData = new FormData(form);
+
+        const data = {
+            name: formData.get('name'),
+            biography: formData.get('biography'),
+            date_of_birth: formData.get('date_of_birth'),
+        };
+
+        try {
+            const response = await fetch('/authors/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.detail || 'Произошла ошибка при отправке данных';
+                } catch (jsonError) {
+                    // Если ответ не является JSON, используем текстовое сообщение
+                    errorMessage = await response.text();
+                }
+                throw new Error(errorMessage || 'Произошла ошибка при отправке данных');
+            }
+        } catch(error) {
+            alert(error)
+        }
+        window.location.reload();
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="flex justify-center flex-col items-center">
+    <form id="author_form" class="flex my-3 gap-5" onsubmit="addAuthor(event)">
+        <input name="name" id="author_name" type="text" placeholder="Имя автора" class="text-xl" required>
+        <input name="biography" id="author_bio" type="text" placeholder="Биография" class="text-xl" required>
+        <input name="date_of_birth" id="author_birth_date" type="date" placeholder="Дата рождения" class="text-xl" required>
+        <button type="submit" class="border-2 rounded-3xl bg-gray-300 p-3">Добавить автора</button>
+    </form>
+    <span>Список авторов:</span>
+    {% for author in authors %}
+        <div class="flex rounded-3 border-2 p-3 mt-5">
+            <img width="150" src="{{ url_for('static', path='placeholder-person.webp') }}" alt="Алё" class="mr-5">
+            <div class="flex flex-col">
+                <span class="text-2xl font-bold">{{ author.name}}</span>
+                <span class="text-lg">{{ author.biography }}</span>
+                <span class="text-lg">{{ author.date_of_birth }}</span>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

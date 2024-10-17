@@ -5,7 +5,7 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import text, ForeignKey, String
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-from src.database import Base, intpk
+from database import Base, intpk
 
 
 class Role(Base):
@@ -29,4 +29,4 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_superuser: Mapped[bool] = mapped_column(default=False)
     is_verified: Mapped[bool] = mapped_column(default=False)
 
-    role: Mapped[Role] = relationship("Role")
+    role: Mapped[Role] = relationship("Role", lazy='selectin')
