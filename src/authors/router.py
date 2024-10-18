@@ -1,49 +1,45 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import select, insert
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import status
 
 from auth.auth import current_user_admin
-from authors.schemas import OperationCreate
-from books.models import Author
-from database import get_async_session
-from dependencies import Paginator
+from authors.schemas import OperationCreate, OperationUpdate, AuthorResponse
+from authors.service import AuthorServiceDep
+from pagination import PaginatorDep
 
 router = APIRouter(prefix="/authors", tags=["Author"])
 
 
-@router.get("/")
-async def get_authors(
-    session: AsyncSession = Depends(get_async_session), pagination_params: Paginator = Depends(Paginator)
-):
-    query = select(Author).limit(pagination_params.limit).offset(pagination_params.skip)
-    result = await session.execute(query)
-    authors = result.scalars().all()
-
-    return {
-        "status": "success",
-        "data": authors,
-        "details": {
-            "total": len(authors),
-            "limit": pagination_params.limit,
-            "skip": pagination_params.skip,
-        },
-    }
-
-
-@router.get("/{author_id}")
-async def get_specific_author(author_id: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(Author).where(Author.id == author_id)
-    result = await session.execute(query)
-    return {"status": "success", "data": result.mappings().all(), "details": None}
-
-
-@router.post("/")
+@router.post("/", response_model=AuthorResponse, status_code=status.HTTP_201_CREATED)
 async def create_author(
-    new_author: OperationCreate,
-    session: AsyncSession = Depends(get_async_session),
+    author: OperationCreate, service: AuthorServiceDep, current_user_admin=Depends(current_user_admin)
+):
+    author = await service.create(author)
+    return author
+
+
+@router.get("/", response_model=list[AuthorResponse], status_code=status.HTTP_200_OK)
+async def get_authors(pagination_params: PaginatorDep, service: AuthorServiceDep):
+    authors = await service.get_all(pagination_params.limit, pagination_params.skip)
+    return authors
+
+
+@router.get("/{author_id}", response_model=AuthorResponse, status_code=status.HTTP_200_OK)
+async def get_specific_author(author_id: int, service: AuthorServiceDep):
+    author = await service.get_by_id(author_id)
+    return author
+
+
+@router.put("/{author_id}", response_model=AuthorResponse, status_code=status.HTTP_200_OK)
+async def update_author(
+    author_id: int,
+    updated_author: OperationUpdate,
+    service: AuthorServiceDep,
     current_user_admin=Depends(current_user_admin),
 ):
-    stmt = insert(Author).values(**new_author.model_dump())
-    await session.execute(stmt)
-    await session.commit()
-    return {"status": "success"}
+    author = await service.update_by_id(author_id, updated_author)
+    return author
+
+
+@router.delete("/{author_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_author(author_id: int, service: AuthorServiceDep, current_user_admin=Depends(current_user_admin)):
+    await service.delete_by_id(author_id)

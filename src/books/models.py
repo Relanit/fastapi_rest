@@ -26,7 +26,7 @@ class Book(Base):
     published_year: Mapped[int | None]
     isbn: Mapped[str | None]
     description: Mapped[str | None]
-    available: Mapped[bool] = mapped_column(default=True)
+    available_count: Mapped[int] = mapped_column(default=0)
 
     author: Mapped["Author"] = relationship("Author", back_populates="books")
 

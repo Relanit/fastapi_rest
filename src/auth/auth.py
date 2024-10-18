@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import Depends, HTTPException
 from fastapi import status
 from fastapi_users import FastAPIUsers

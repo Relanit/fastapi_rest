@@ -39,9 +39,9 @@ async def prepare_database():
 
 
 @pytest.fixture(scope="session")
-async def ac() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        yield ac
+async def client() -> AsyncGenerator[AsyncClient, None]:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        yield client
 
 
 def get_fastapi_dependency_from_annotation(a: Annotated[T, params.Depends]) -> T:
@@ -52,7 +52,7 @@ AdminUser = Annotated[User, Depends(current_user_admin)]
 
 
 @pytest.fixture(scope="session")
-def get_admin_async_client():
+def get_admin_client():
     async def _authenticated_client(user: User) -> AsyncClient:
         # Override the dependency to act as if a user is authenticated
         dep = get_fastapi_dependency_from_annotation(AdminUser)
@@ -66,7 +66,7 @@ def get_admin_async_client():
     app.dependency_overrides = {}
 
 
-GetAdminAsyncClient = Callable[[User], Awaitable[AsyncClient]]
+GetAdminClient = Callable[[User], Awaitable[AsyncClient]]
 
 
 def pytest_collection_modifyitems(items):

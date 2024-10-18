@@ -21,8 +21,8 @@ async def test_add_role():
         assert expected_role == result_role
 
 
-async def test_register(ac: AsyncClient):
-    response = await ac.post(
+async def test_register(client: AsyncClient):
+    response = await client.post(
         "/auth/register",
         json={
             "email": "user@example.com",

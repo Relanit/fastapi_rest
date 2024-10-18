@@ -6,7 +6,7 @@ from alembic import context
 
 from config import Config
 from auth.models import *
-from authors.models import *
+from books.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
