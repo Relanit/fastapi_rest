@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi import status
 
 from auth.auth import current_user_admin
-from authors.schemas import OperationCreate, OperationUpdate, AuthorResponse
+from authors.schemas import AuthorCreate, AuthorUpdate, AuthorResponse
 from authors.service import AuthorServiceDep
 from pagination import PaginatorDep
 
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/authors", tags=["Author"])
 
 @router.post("/", response_model=AuthorResponse, status_code=status.HTTP_201_CREATED)
 async def create_author(
-    author: OperationCreate, service: AuthorServiceDep, current_user_admin=Depends(current_user_admin)
+    author: AuthorCreate, service: AuthorServiceDep, current_user_admin=Depends(current_user_admin)
 ):
     author = await service.create(author)
     return author
@@ -32,7 +32,7 @@ async def get_specific_author(author_id: int, service: AuthorServiceDep):
 @router.put("/{author_id}", response_model=AuthorResponse, status_code=status.HTTP_200_OK)
 async def update_author(
     author_id: int,
-    updated_author: OperationUpdate,
+    updated_author: AuthorUpdate,
     service: AuthorServiceDep,
     current_user_admin=Depends(current_user_admin),
 ):

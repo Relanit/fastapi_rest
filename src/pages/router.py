@@ -10,5 +10,5 @@ templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/authors")
-def get_search_page(request: Request, authors=Depends(get_authors)):
-    return templates.TemplateResponse("authors.html", {"request": request, "authors": authors["data"]})
+def get_authors_page(request: Request, authors=Depends(get_authors)):
+    return templates.TemplateResponse("authors.html", {"request": request, "authors": authors})

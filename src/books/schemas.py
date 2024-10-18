@@ -17,3 +17,13 @@ class BookUpdate(BaseModel):
     isbn: str | None
     description: str | None
     available_count: int
+
+
+class BookResponse(BaseModel):
+    id: int
+    title: str
+    author_id: int
+    published_year: int | None
+    isbn: str | None
+    description: str | None
+    available_count: int

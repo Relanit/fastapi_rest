@@ -1,8 +1,8 @@
 """create database
 
-Revision ID: c9e8bf2dd69b
+Revision ID: 333cb7fb98cc
 Revises: 
-Create Date: 2024-10-18 14:09:04.075757
+Create Date: 2024-10-18 17:51:46.327448
 
 """
 
@@ -15,7 +15,7 @@ from sqlalchemy import orm
 from auth.models import Role
 
 # revision identifiers, used by Alembic.
-revision: str = "c9e8bf2dd69b"
+revision: str = "333cb7fb98cc"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,7 +28,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("biography", sa.String(), nullable=True),
-        sa.Column("date_of_birth", sa.DateTime(), nullable=True),
+        sa.Column("date_of_birth", sa.Date(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
     )
@@ -44,11 +44,7 @@ def upgrade() -> None:
 
     bind = op.get_bind()
     session = orm.Session(bind=bind)
-
-    # Создаем базовые роли
     session.add_all([Role(name="user", permissions={}), Role(name="admin", permissions={})])
-
-    # Подтверждаем изменения
     session.commit()
 
     op.create_table(
@@ -91,8 +87,8 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("book_id", sa.Integer(), nullable=False),
-        sa.Column("borrow_date", sa.String(), nullable=False),
-        sa.Column("return_date", sa.DateTime(), nullable=True),
+        sa.Column("borrow_date", sa.Date(), nullable=False),
+        sa.Column("return_date", sa.Date(), nullable=True),
         sa.ForeignKeyConstraint(
             ["book_id"],
             ["book.id"],

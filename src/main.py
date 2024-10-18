@@ -13,8 +13,8 @@ from fastapi.staticfiles import StaticFiles
 from auth.auth import auth_backend, fastapi_users, current_user
 from auth.models import User
 from auth.schemas import UserRead, UserCreate
-from authors.router import router as router_books
-from database import get_async_session
+from authors.router import router as router_authors
+from books.router import router as router_books
 from pages.router import router as router_pages
 
 
@@ -72,5 +72,6 @@ app.include_router(
     tags=["auth"],
 )
 
+app.include_router(router_authors)
 app.include_router(router_books)
 app.include_router(router_pages)
