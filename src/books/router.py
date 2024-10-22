@@ -35,6 +35,12 @@ async def get_specific_book(book: Book = Depends(valid_book_id)):
     return book
 
 
+@router.get("/search/", response_model=list[BookResponse])
+async def search_books(search_query: str, service: BookServiceDep):
+    books = await service.search_books(search_query)
+    return books
+
+
 @router.put("/{book_id}", response_model=BookResponse, status_code=status.HTTP_200_OK)
 async def update_book(
     updated_book: BookUpdate,

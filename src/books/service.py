@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from fastapi import Depends
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, or_, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from authors.exceptions import AuthorNotFound
@@ -47,6 +47,28 @@ class BookService:
         if not book:
             raise BookNotFound()
         return book
+
+    async def search_books(self, search_query: str) -> Sequence[Book]:
+        search_terms = search_query.split()
+
+        title_conditions = [Book.title.ilike(f"%{term}%") for term in search_terms]
+        author_conditions = [Author.name.ilike(f"%{term}%") for term in search_terms]
+
+        book_cases = [(Book.title.ilike(f"%{term}%"), 1) for term in search_terms]
+        author_cases = [(Author.name.ilike(f"%{term}%"), 1) for term in search_terms]
+
+        title_match_score = case(*book_cases, else_=0)
+        author_match_score = case(*author_cases, else_=0)
+
+        query = (
+            select(Book)
+            .join(Author)
+            .filter(or_(*title_conditions, *author_conditions))
+            .order_by(func.coalesce(title_match_score, 0) + func.coalesce(author_match_score, 0).desc())
+        )
+
+        result = await self.session.execute(query)
+        return result.scalars().all()
 
     async def update_full(self, book: Book, updated_book: BookUpdate) -> Book:
         for key, value in updated_book.model_dump(exclude_unset=True).items():

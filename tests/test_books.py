@@ -58,6 +58,14 @@ async def test_get_specific_book(admin_client: AsyncClient):
 
 
 @pytest.mark.dependency(depends=["test_create_book"])
+async def test_search_books(admin_client: AsyncClient):
+    response = await admin_client.get("/books/search/?search_query=author book")
+    assert response.status_code == status.HTTP_200_OK
+    assert len(response.json()) > 0
+    assert response.json()[0]["title"] == "Test Book"
+
+
+@pytest.mark.dependency(depends=["test_create_book"])
 async def test_update_book(admin_client: AsyncClient):
     updated_data = {
         "title": "Updated Test Book",

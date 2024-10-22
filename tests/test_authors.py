@@ -21,7 +21,7 @@ async def test_create_author(admin_client: AsyncClient):
 
 async def test_create_author_with_invalid_date(admin_client: AsyncClient):
     response = await admin_client.post(
-        "/authors/", json={"name": "Test n Author c", "biography": "Test bio", "date_of_birth": "invalid-date"}
+        "/authors/", json={"name": "test author invalid", "biography": "Test bio", "date_of_birth": "invalid-date"}
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
