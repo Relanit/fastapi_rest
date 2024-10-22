@@ -1,12 +1,12 @@
-from datetime import datetime, date
+from datetime import date, datetime
 
 from pydantic import BaseModel, field_validator
 
 
 class AuthorBase(BaseModel):
     name: str
-    biography: str | None
-    date_of_birth: datetime | None
+    biography: str | None = None
+    date_of_birth: date | None = None
 
     @field_validator("name")
     def validate_name(cls, value: str) -> str:
@@ -34,6 +34,10 @@ class AuthorCreate(AuthorBase):
 
 class AuthorUpdate(AuthorBase):
     pass
+
+
+class AuthorPatchUpdate(AuthorBase):
+    name: str | None = None
 
 
 class AuthorResponse(AuthorBase):

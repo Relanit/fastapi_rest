@@ -4,3 +4,6 @@ pythonpath = [
 ]
 asyncio_default_fixture_loop_scope = "session"
 asyncio_mode = "auto"
+markers = [
+    "dependency: mark test as dependent on other tests"
+]

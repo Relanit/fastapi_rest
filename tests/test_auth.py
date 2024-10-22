@@ -1,3 +1,5 @@
+import pytest
+from fastapi import status
 from httpx import AsyncClient
 from sqlalchemy import insert, select
 
@@ -5,7 +7,8 @@ from auth.models import Role
 from tests.conftest import async_session_maker
 
 
-async def test_add_role():
+@pytest.mark.dependency()
+async def test_add_roles():
     async with async_session_maker() as session:
         stmt = insert(Role).values(id=1, name="user", permissions=None)
         await session.execute(stmt)
@@ -21,6 +24,7 @@ async def test_add_role():
         assert expected_role == result_role
 
 
+@pytest.mark.dependency(depends=["test_add_roles"])
 async def test_register(client: AsyncClient):
     response = await client.post(
         "/auth/register",
@@ -35,4 +39,43 @@ async def test_register(client: AsyncClient):
         },
     )
 
-    assert response.status_code == 201
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+async def test_bad_registration(client: AsyncClient):
+    response = await client.post(
+        "/auth/register",
+        json={
+            "email": "user@example.com",
+            "password": 123,
+            "is_active": True,
+            "is_superuser": False,
+            "is_verified": False,
+            "username": 123,
+        },
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.dependency(depends=["test_register"])
+async def test_login(client: AsyncClient):
+    response = await client.post(
+        "/auth/jwt/login",
+        data={
+            "username": "user@example.com",
+            "password": "string",
+        },
+    )
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.dependency(depends=["test_register"])
+async def test_bad_login(client: AsyncClient):
+    response = await client.post(
+        "/auth/jwt/login",
+        data={
+            "username": "user@example.com",
+            "password": "invalid_password",
+        },
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
