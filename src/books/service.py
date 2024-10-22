@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from fastapi import Depends
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,7 +23,7 @@ class BookService:
 
         return author
 
-    async def create(self, book: BookCreate):
+    async def create(self, book: BookCreate) -> Book:
         await self.valid_author_id(book.author_id)
 
         stmt = insert(Book).values(**book.model_dump()).returning(Book)
@@ -29,7 +31,7 @@ class BookService:
         await self.session.commit()
         return result.scalar_one()
 
-    async def get_all(self, limit: int, skip: int, author_id: int | None):
+    async def get_all(self, limit: int, skip: int, author_id: int | None) -> Sequence[Book]:
         query = select(Book).limit(limit).offset(skip)
         if author_id is not None:
             await self.valid_author_id(author_id)
@@ -38,7 +40,7 @@ class BookService:
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def get_by_id(self, book_id: int):
+    async def get_by_id(self, book_id: int) -> Book:
         query = select(Book).where(Book.id == book_id)
         result = await self.session.execute(query)
         book = result.scalar_one_or_none()
@@ -46,7 +48,7 @@ class BookService:
             raise BookNotFound()
         return book
 
-    async def update_full(self, book: Book, updated_book: BookUpdate):
+    async def update_full(self, book: Book, updated_book: BookUpdate) -> Book:
         for key, value in updated_book.model_dump(exclude_unset=True).items():
             setattr(book, key, value)
 
