@@ -58,6 +58,6 @@ class AuthorService:
         await self.session.commit()
         return author
 
-    async def delete_by_id(self, author: Author) -> None:
+    async def delete(self, author: Author) -> None:
         await self.session.delete(author)
         await self.session.commit()

@@ -61,4 +61,4 @@ async def partial_update_book(
 async def delete_book(
     service: BookServiceDep, book: Book = Depends(valid_book_id), current_user_admin=Depends(current_user_admin)
 ):
-    await service.delete_by_id(book)
+    await service.delete(book)

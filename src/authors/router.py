@@ -57,4 +57,4 @@ async def partial_update_author(
 async def delete_author(
     service: AuthorServiceDep, author: Author = Depends(valid_author_id), current_user_admin=Depends(current_user_admin)
 ):
-    await service.delete_by_id(author)
+    await service.delete(author)

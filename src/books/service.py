@@ -63,6 +63,6 @@ class BookService:
         await self.session.commit()
         return book
 
-    async def delete_by_id(self, book: Book) -> None:
+    async def delete(self, book: Book) -> None:
         await self.session.delete(book)
         await self.session.commit()
