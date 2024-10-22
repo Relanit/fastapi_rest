@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from authors.exceptions import AuthorNotFound
 from books.exceptions import BookNotFound
 from books.schemas import BookUpdate, BookCreate, BookPatchUpdate
-from books.models import Book, Author
+from models import Book, Author
 from database import get_async_session
 
 

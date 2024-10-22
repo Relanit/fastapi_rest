@@ -3,7 +3,7 @@ from fastapi import status
 
 from auth.auth import current_user_admin
 from books.dependencies import valid_book_id, BookServiceDep
-from books.models import Book
+from models import Book
 from books.schemas import BookCreate, BookUpdate, BookResponse, BookPatchUpdate
 from pagination import PaginatorDep
 

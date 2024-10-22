@@ -4,7 +4,7 @@ from fastapi import status
 from auth.auth import current_user_admin
 from authors.dependencies import valid_author_id, AuthorServiceDep
 from authors.schemas import AuthorCreate, AuthorUpdate, AuthorResponse, AuthorPatchUpdate
-from books.models import Author
+from models import Author
 from pagination import PaginatorDep
 
 router = APIRouter(prefix="/authors", tags=["Author"])

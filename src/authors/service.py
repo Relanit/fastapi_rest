@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from authors.exceptions import AuthorAlreadyExists
 from authors.schemas import AuthorUpdate, AuthorCreate, AuthorPatchUpdate
-from books.models import Author
+from models import Author
 from database import get_async_session
 
 

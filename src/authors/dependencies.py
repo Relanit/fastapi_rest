@@ -4,7 +4,7 @@ from fastapi import Depends
 
 from authors.exceptions import AuthorNotFound
 from authors.service import AuthorService
-from books.models import Author
+from models import Author
 
 AuthorServiceDep = Annotated[AuthorService, Depends(AuthorService)]
 

@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 
 from books.exceptions import BookNotFound
-from books.models import Author
+from models import Author
 from books.service import BookService
 
 BookServiceDep = Annotated[BookService, Depends(BookService)]
