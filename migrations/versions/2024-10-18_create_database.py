@@ -12,7 +12,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import orm
 
-from auth.models import Role
+from models import Role
 
 # revision identifiers, used by Alembic.
 revision: str = "333cb7fb98cc"

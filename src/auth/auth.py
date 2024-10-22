@@ -1,12 +1,10 @@
-from typing import Annotated
-
 from fastapi import Depends, HTTPException
 from fastapi import status
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import CookieTransport, JWTStrategy, AuthenticationBackend
 
-from auth.manager import get_user_manager
-from auth.models import User
+from .manager import get_user_manager
+from models import User
 from config import config
 
 cookie_transport = CookieTransport(cookie_name="library", cookie_max_age=3600)

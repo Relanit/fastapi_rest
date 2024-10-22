@@ -3,19 +3,14 @@ from typing import Optional
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin, schemas, models, exceptions
 from fastapi_users.db import BaseUserDatabase
-from fastapi_users.password import PasswordHelperProtocol, PasswordHelper
+from fastapi_users.password import PasswordHelperProtocol
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import config
-from auth.models import User
+from models import User
 from auth.utils import get_user_db
 from database import get_async_session
-
-
-async def get_session() -> AsyncSession:
-    async with get_async_session() as session:
-        yield
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):

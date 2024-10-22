@@ -2,7 +2,6 @@ import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-import uvicorn
 from fastapi import FastAPI, Depends
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
@@ -11,7 +10,7 @@ from redis import asyncio as aioredis
 from fastapi.staticfiles import StaticFiles
 
 from auth.auth import auth_backend, fastapi_users, current_user
-from auth.models import User
+from models import User
 from auth.schemas import UserRead, UserCreate
 from authors.router import router as router_authors
 from books.router import router as router_books

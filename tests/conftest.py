@@ -7,7 +7,7 @@ from pytest_asyncio import is_async_test
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from auth.auth import current_user_admin
-from auth.models import User
+from models import User
 from config import config
 from database import get_async_session, Base
 from main import app
