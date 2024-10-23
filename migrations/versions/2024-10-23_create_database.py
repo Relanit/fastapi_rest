@@ -1,8 +1,8 @@
 """create database
 
-Revision ID: fd3cf2d577eb
+Revision ID: 301fc0f428c7
 Revises: 
-Create Date: 2024-10-23 14:52:28.835492
+Create Date: 2024-10-23 18:16:30.363352
 
 """
 
@@ -15,7 +15,7 @@ from sqlalchemy import orm
 from models import Role
 
 # revision identifiers, used by Alembic.
-revision: str = "fd3cf2d577eb"
+revision: str = "301fc0f428c7"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -52,7 +52,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("title", sa.String(), nullable=False),
         sa.Column("author_id", sa.Integer(), nullable=False),
-        sa.Column("published_year", sa.Integer(), nullable=True),
+        sa.Column("published_year", sa.Integer(), nullable=False),
         sa.Column("isbn", sa.String(), nullable=False),
         sa.Column("description", sa.String(), nullable=True),
         sa.Column("available_count", sa.Integer(), nullable=False),

@@ -30,7 +30,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_verified: Mapped[bool] = mapped_column(default=False)
 
     role: Mapped[Role] = relationship("Role", lazy="selectin")
-    borrowed_books = relationship("Borrow", back_populates="user", lazy="selectin")
+    borrowed_books = relationship("Borrowing", back_populates="user", lazy="selectin")
 
 
 class Author(Base):
@@ -50,7 +50,7 @@ class Book(Base):
     id: Mapped[intpk]
     title: Mapped[str]
     author_id: Mapped[int] = mapped_column(ForeignKey("author.id"))
-    published_year: Mapped[int | None]
+    published_year: Mapped[int]
     isbn: Mapped[str] = mapped_column(unique=True)
     description: Mapped[str | None]
     available_count: Mapped[int] = mapped_column(default=0)
@@ -58,7 +58,7 @@ class Book(Base):
     author: Mapped["Author"] = relationship("Author", back_populates="books", lazy="selectin")
 
 
-class Borrow(Base):
+class Borrowing(Base):
 
     __tablename__ = "borrowed_book"
 

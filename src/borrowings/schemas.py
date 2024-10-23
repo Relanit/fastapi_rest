@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from pydantic import BaseModel, field_validator
 
 
-class BorrowCreate(BaseModel):
+class BorrowBase(BaseModel):
     user_id: int
     book_id: int
     borrow_date: date | None = date.today()
@@ -11,14 +11,12 @@ class BorrowCreate(BaseModel):
 
     @field_validator("user_id")
     def validate_user_id(cls, value: int) -> int:
-        value = value
         if value < 0:
             raise ValueError("User id must be a non-negative number")
         return value
 
     @field_validator("book_id")
     def validate_book_id(cls, value: int) -> int:
-        value = value
         if value < 0:
             raise ValueError("Book id must be a non-negative number")
         return value
@@ -26,7 +24,7 @@ class BorrowCreate(BaseModel):
     @field_validator("borrow_date")
     def validate_borrow_date(cls, value: date) -> date:
         if value > date.today():
-            raise ValueError("Borrow date must not be in the future")
+            raise ValueError("Borrowing date must not be in the future")
         return value
 
     @field_validator("return_deadline")
@@ -36,10 +34,23 @@ class BorrowCreate(BaseModel):
         return value
 
 
-class BorrowResponse(BaseModel):
+class BorrowCreate(BorrowBase):
+    pass
+
+
+class BorrowUpdate(BorrowBase):
+    pass
+
+
+class BorrowPatchUpdate(BorrowBase):
+    user_id: int | None = None
+    book_id: int | None = None
+    borrow_date: date | None = None
+    return_deadline: date | None = None
+
+
+class BorrowResponse(BorrowBase):
     id: int
-    user_id: int
-    book_id: int
     borrow_date: date
     return_deadline: date
     return_date: date | None

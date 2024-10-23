@@ -6,7 +6,7 @@ from httpx import AsyncClient, ASGITransport
 from pytest_asyncio import is_async_test
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from auth.auth import current_user_admin
+from auth.auth import current_user_admin, current_user
 from models import User
 from config import config
 from database import get_async_session, Base
@@ -49,6 +49,7 @@ def get_fastapi_dependency_from_annotation(a: Annotated[T, params.Depends]) -> T
 
 
 AdminUser = Annotated[User, Depends(current_user_admin)]
+CurrentUser = Annotated[User, Depends(current_user)]
 
 
 @pytest.fixture(scope="session")
@@ -56,6 +57,9 @@ def get_admin_client():
     async def _authenticated_client(user: User) -> AsyncClient:
         # Override the dependency to act as if a user is authenticated
         dep = get_fastapi_dependency_from_annotation(AdminUser)
+        app.dependency_overrides[dep] = lambda: user
+
+        dep = get_fastapi_dependency_from_annotation(CurrentUser)
         app.dependency_overrides[dep] = lambda: user
 
         return AsyncClient(transport=ASGITransport(app=app), base_url="http://test")

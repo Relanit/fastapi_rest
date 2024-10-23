@@ -44,8 +44,6 @@ class BookService:
         query = select(Book).where(Book.id == book_id)
         result = await self.session.execute(query)
         book = result.scalar_one_or_none()
-        if not book:
-            raise BookNotFound()
         return book
 
     async def search_books(self, search_query: str) -> Sequence[Book]:
@@ -71,6 +69,8 @@ class BookService:
         return result.scalars().all()
 
     async def update_full(self, book: Book, updated_book: BookUpdate) -> Book:
+        await self.valid_author_id(book.author_id)
+
         for key, value in updated_book.model_dump(exclude_unset=True).items():
             setattr(book, key, value)
 
@@ -80,6 +80,10 @@ class BookService:
 
     async def update_partial(self, book: Book, book_data: BookPatchUpdate) -> Book:
         update_data = book_data.model_dump(exclude_unset=True)
+
+        if "author_id" in update_data:
+            await self.valid_author_id(update_data["author_id"])
+
         for key, value in update_data.items():
             setattr(book, key, value)
 
