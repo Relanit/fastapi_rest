@@ -22,11 +22,11 @@ async def create_book(
 
 @router.get("/", response_model=list[BookResponse], status_code=status.HTTP_200_OK)
 async def get_books(
-    pagination_params: PaginatorDep,
+    pagination: PaginatorDep,
     service: BookServiceDep,
     author_id: int | None = None,
 ):
-    books = await service.get_all(pagination_params.limit, pagination_params.skip, author_id)
+    books = await service.get_all(pagination.limit, pagination.skip, author_id)
     return books
 
 

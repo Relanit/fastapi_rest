@@ -14,6 +14,7 @@ from models import User
 from auth.schemas import UserRead, UserCreate
 from authors.router import router as router_authors
 from books.router import router as router_books
+from borrows.router import router as router_borrows
 from pages.router import router as router_pages
 
 
@@ -73,4 +74,5 @@ app.include_router(
 
 app.include_router(router_authors)
 app.include_router(router_books)
+app.include_router(router_borrows)
 app.include_router(router_pages)

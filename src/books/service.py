@@ -32,11 +32,11 @@ class BookService:
         return result.scalar_one()
 
     async def get_all(self, limit: int, skip: int, author_id: int | None) -> Sequence[Book]:
-        query = select(Book).limit(limit).offset(skip)
         if author_id is not None:
-            await self.valid_author_id(author_id)
-            query = query.where(Book.author_id == author_id)
+            author = await self.valid_author_id(author_id)
+            return author.books[skip : skip + limit]
 
+        query = select(Book).limit(limit).offset(skip)
         result = await self.session.execute(query)
         return result.scalars().all()
 

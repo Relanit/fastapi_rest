@@ -21,8 +21,8 @@ async def create_author(
 
 
 @router.get("/", response_model=list[AuthorResponse], status_code=status.HTTP_200_OK)
-async def get_authors(pagination_params: PaginatorDep, service: AuthorServiceDep):
-    authors = await service.get_all(pagination_params.limit, pagination_params.skip)
+async def get_authors(pagination: PaginatorDep, service: AuthorServiceDep):
+    authors = await service.get_all(pagination.limit, pagination.skip)
     return authors
 
 
