@@ -15,8 +15,8 @@ async def create_borrow(
     service: BorrowServiceDep,
     current_user_admin=Depends(current_user_admin),
 ):
-    book = await service.create(borrow)
-    return book
+    borrow = await service.create(borrow)
+    return borrow
 
 
 @router.get("/", response_model=list[BorrowResponse], status_code=status.HTTP_200_OK)
@@ -26,5 +26,5 @@ async def get_borrows(
     user_id: int | None = None,
     current_user_admin=Depends(current_user_admin),
 ):
-    book = await service.get_all(pagination.limit, pagination.skip, user_id)
-    return book
+    borrows = await service.get_all(pagination.limit, pagination.skip, user_id)
+    return borrows
