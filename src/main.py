@@ -10,6 +10,7 @@ from redis import asyncio as aioredis
 from fastapi.staticfiles import StaticFiles
 
 from auth.auth import auth_backend, fastapi_users, current_user
+from config import config
 from models import User
 from auth.schemas import UserRead, UserCreate
 from authors.router import router as router_authors
@@ -20,14 +21,18 @@ from pages.router import router as router_pages
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    redis = aioredis.from_url("redis://localhost")
+    redis = aioredis.from_url(f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
 
 
 app = FastAPI(title="Library app", lifespan=lifespan)
 
-app.mount("/static", StaticFiles(directory="static" if "uvicorn" in sys.argv[0] else "src/static"), name="static")
+app.mount(
+    "/static",
+    StaticFiles(directory="static" if "uvicorn" in sys.argv[0] or "gunicorn" in sys.argv[0] else "src/static"),
+    name="static",
+)
 
 
 origins = ["http://localhost:3000"]

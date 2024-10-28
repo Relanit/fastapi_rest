@@ -12,7 +12,8 @@ from config import config
 from database import get_async_session, Base
 from main import app
 
-engine_test = create_async_engine(config.TEST_DB_URL)
+url = f"postgresql+asyncpg://{config.DB_USER_TEST}:{config.DB_PASS_TEST}@{config.DB_HOST_TEST}:{config.DB_PORT_TEST}/{config.DB_NAME_TEST}"
+engine_test = create_async_engine(url)
 async_session_maker = async_sessionmaker(engine_test, expire_on_commit=False)
 metadata = Base.metadata
 metadata.bind = engine_test

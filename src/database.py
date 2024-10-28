@@ -14,7 +14,8 @@ class Base(DeclarativeBase):
 intpk = Annotated[int, mapped_column(primary_key=True, index=True, autoincrement=True)]
 
 
-engine = create_async_engine(config.DB_URL)
+url = f"postgresql+asyncpg://{config.DB_USER}:{config.DB_PASS}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+engine = create_async_engine(url)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 

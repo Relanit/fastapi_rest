@@ -14,7 +14,11 @@ config = context.config
 section = config.config_ini_section
 
 cfg = Config(_env_file="./.env")
-config.set_section_option(section, "DB_URL", cfg.DB_URL)
+config.set_section_option(section, "DB_USER", cfg.DB_USER)
+config.set_section_option(section, "DB_PASS", cfg.DB_PASS)
+config.set_section_option(section, "DB_HOST", cfg.DB_HOST)
+config.set_section_option(section, "DB_PORT", cfg.DB_PORT)
+config.set_section_option(section, "DB_NAME", cfg.DB_NAME)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
