@@ -13,7 +13,7 @@ config = context.config
 
 section = config.config_ini_section
 
-cfg = Config(_env_file="./.env")
+cfg = Config()
 config.set_section_option(section, "DB_USER", cfg.DB_USER)
 config.set_section_option(section, "DB_PASS", cfg.DB_PASS)
 config.set_section_option(section, "DB_HOST", cfg.DB_HOST)

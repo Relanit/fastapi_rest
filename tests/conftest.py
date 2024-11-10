@@ -1,6 +1,8 @@
+import os
 from typing import AsyncGenerator, Annotated, TypeVar, get_args, Callable, Awaitable
 
 import pytest
+from dotenv import load_dotenv
 from fastapi import Depends, params
 from httpx import AsyncClient, ASGITransport
 from pytest_asyncio import is_async_test
@@ -8,11 +10,16 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from auth.auth import current_user_admin, current_user
 from models import User
-from config import config
 from database import get_async_session, Base
 from main import app
 
-url = f"postgresql+asyncpg://{config.DB_USER_TEST}:{config.DB_PASS_TEST}@{config.DB_HOST_TEST}:{config.DB_PORT_TEST}/{config.DB_NAME_TEST}"
+load_dotenv(".env.test")
+
+
+url = (
+    f"postgresql+asyncpg://{os.getenv('DB_USER_TEST')}:{os.getenv('DB_PASS_TEST')}@"
+    f"{os.getenv('DB_HOST_TEST')}:{os.getenv('DB_PORT_TEST')}/{os.getenv('DB_NAME_TEST')}"
+)
 engine_test = create_async_engine(url)
 async_session_maker = async_sessionmaker(engine_test, expire_on_commit=False)
 metadata = Base.metadata

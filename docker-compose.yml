@@ -1,30 +1,39 @@
-version: "3.8"
 services:
   db:
     image: postgres:17
     container_name: db_app
     command: -p 2222
     expose:
-      - 2222
+      - "2222"
     env_file:
-      - .env-non-dev
+      - .env.prod
+
+  test_db:
+    image: postgres:17
+    container_name: test_db_app
+    command: -p 5433
+    expose:
+      - "5433"
+    env_file:
+      - .env.test
 
   redis:
     image: redis:7
     container_name: redis_app
     command: --port 5370
     expose:
-      - 5370
+      - "5370"
 
   app:
     build:
       context: .
     env_file:
-      - .env-non-dev
+      - .env.prod
     container_name: fastapi_rest
     command: ["/fastapi_rest/docker/app.sh"]
     ports:
-      - 9999:8000
+      - "9999:8000"
     depends_on:
       - db
       - redis
+      - test_db
