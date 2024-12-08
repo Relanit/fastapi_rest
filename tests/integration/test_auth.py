@@ -4,7 +4,7 @@ from httpx import AsyncClient
 from sqlalchemy import insert, select
 
 from models import Role
-from tests.conftest import async_session_maker
+from conftest import async_session_maker
 
 
 @pytest.mark.dependency()
