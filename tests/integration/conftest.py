@@ -64,6 +64,7 @@ CurrentUser = Annotated[User, Depends(current_user)]
 def get_admin_client():
     async def _authenticated_client(user: User) -> AsyncClient:
         # Override the dependency to act as if a user is authenticated
+
         dep = get_fastapi_dependency_from_annotation(AdminUser)
         app.dependency_overrides[dep] = lambda: user
 
@@ -81,13 +82,35 @@ GetAdminClient = Callable[[User], Awaitable[AsyncClient]]
 
 
 @pytest.fixture(scope="session")
-async def admin_client(get_admin_client: GetAdminClient):
-    user = User(username="admin", email="admin@test.com", hashed_password="test", role_id=2, is_superuser=True)
+async def session_fixture() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        yield session
+
+
+@pytest.fixture(scope="session")
+async def admin_client(get_admin_client: GetAdminClient, session_fixture):
+    user = User(
+        username="admin", email="admin@test.com", hashed_password="test", role_id=2, is_superuser=True, balance=1000.0
+    )
+    async with session_fixture as session:
+        session.add(user)
+        await session.commit()
+
     client = await get_admin_client(user)
     return client
 
 
-def pytest_collection_modifyitems(items):
+def pytest_collection_modifyitems(session, items):
+    order = {
+        "tests/integration/test_auth.py": 0,
+        "tests/integration/test_companies.py": 1,
+        "tests/integration/test_assets.py": 2,
+        "tests/integration/test_transactions.py": 3,
+    }
+
+    root_path = str(session.config.rootpath)
+    items.sort(key=lambda item: order.get(str(item.fspath.relto(root_path)), 99))
+
     pytest_asyncio_tests = (item for item in items if is_async_test(item))
     session_scope_marker = pytest.mark.asyncio(loop_scope="session")
     for async_test in pytest_asyncio_tests:
