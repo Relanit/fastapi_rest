@@ -16,8 +16,6 @@ FastAPI-приложение инвестиционная платформа. П
 ```bash
 git clone https://github.com/Relanit/fastapi_rest.git
 cd fastapi_rest
-docker build . -t fastapi_rest:latest
-docker compose build
 docker compose up -d
 ```
 
