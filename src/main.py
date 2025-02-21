@@ -13,11 +13,11 @@ from auth.auth import auth_backend, fastapi_users, current_user
 from config import config
 from models import User
 from auth.schemas import UserRead, UserCreate
-from companies.router import router as router_authors
-from assets.router import router as router_books
-from transactions.router import router as router_borrowings
-from pages.router import router as router_pages
+from companies.router import router as router_companies
+from assets.router import router as router_assets
+from transactions.router import router as router_transactions
 from balance.router import router as router_balance
+from pages.router import router as router_pages
 
 
 @asynccontextmanager
@@ -79,8 +79,8 @@ app.include_router(
     tags=["auth"],
 )
 
-app.include_router(router_authors)
-app.include_router(router_books)
-app.include_router(router_borrowings)
 app.include_router(router_pages)
+app.include_router(router_companies)
+app.include_router(router_assets)
+app.include_router(router_transactions)
 app.include_router(router_balance)
