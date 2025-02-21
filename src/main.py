@@ -27,7 +27,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(title="Library app", lifespan=lifespan)
+app = FastAPI(title="Invest app", lifespan=lifespan)
 
 app.mount(
     "/static",
