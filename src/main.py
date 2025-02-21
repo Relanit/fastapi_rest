@@ -13,10 +13,11 @@ from auth.auth import auth_backend, fastapi_users, current_user
 from config import config
 from models import User
 from auth.schemas import UserRead, UserCreate
-from authors.router import router as router_authors
-from books.router import router as router_books
-from borrowings.router import router as router_borrowings
+from companies.router import router as router_authors
+from assets.router import router as router_books
+from transactions.router import router as router_borrowings
 from pages.router import router as router_pages
+from balance.router import router as router_balance
 
 
 @asynccontextmanager
@@ -58,6 +59,7 @@ def get_current_user(user: User = Depends(current_user)):
         id=user.id,
         email=user.email,
         username=user.username,
+        balance=user.balance,
         role_id=user.role_id,
         is_active=user.is_active,
         is_superuser=user.is_superuser,
@@ -81,3 +83,4 @@ app.include_router(router_authors)
 app.include_router(router_books)
 app.include_router(router_borrowings)
 app.include_router(router_pages)
+app.include_router(router_balance)

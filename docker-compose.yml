@@ -37,3 +37,5 @@ services:
       - db
       - redis
       - test_db
+    volumes:
+      - .:/fastapi_rest
