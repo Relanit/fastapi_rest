@@ -8,6 +8,11 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from database import Base, intpk
 
 
+USER_ROLE_ID = 1
+
+ADMIN_ROLE_ID = 2
+
+
 class Role(Base):
     __tablename__ = "role"
     id: Mapped[intpk]

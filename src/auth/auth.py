@@ -4,7 +4,7 @@ from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import CookieTransport, JWTStrategy, AuthenticationBackend
 
 from .manager import get_user_manager
-from models import User
+from models import User, ADMIN_ROLE_ID
 from config import config
 
 cookie_transport = CookieTransport(cookie_name="library", cookie_max_age=3600)
@@ -26,7 +26,7 @@ current_user = fastapi_users.current_user()
 
 
 async def current_user_admin(user: User = Depends(current_user)):
-    if user.role_id != 2 and user.role.name != "admin":
+    if user.role_id != ADMIN_ROLE_ID and user.role.name != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Admin role is required for this endpoint"
         )

@@ -1,3 +1,4 @@
+import math
 from typing import Sequence
 
 from fastapi import Depends
@@ -39,7 +40,7 @@ class TransactionService:
         if asset.available_count <= 0:
             raise AssetNotAvailable()
 
-        if transaction.amount != asset.price:
+        if not math.isclose(transaction.amount, asset.price, rel_tol=1e-9, abs_tol=1e-2):
             raise TransactionAmountMismatch()
 
         if user.balance < asset.price:

@@ -8,7 +8,7 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import config
-from models import User
+from models import User, USER_ROLE_ID
 from auth.utils import get_user_db
 from database import get_async_session
 
@@ -62,7 +62,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user_dict = user_create.create_update_dict() if safe else user_create.create_update_dict_superuser()
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
-        user_dict["role_id"] = 1
+        user_dict["role_id"] = USER_ROLE_ID
 
         created_user = await self.user_db.create(user_dict)
 

@@ -29,7 +29,15 @@ async def test_create_transaction(client: AsyncClient):
 async def test_get_all_transactions(admin_client: AsyncClient):
     response = await admin_client.get("/transactions/")
     assert response.status_code == status.HTTP_200_OK
-    assert isinstance(response.json(), list)
+    transactions = response.json()
+    assert isinstance(transactions, list)
+
+    for trx in transactions:
+        assert "user_id" in trx
+        assert "asset_id" in trx
+        assert "purchase_date" in trx
+        assert "target_sell_date" in trx
+        assert "amount" in trx
 
 
 @pytest.mark.dependency(depends=["test_create_transaction"])

@@ -16,14 +16,12 @@ async def create_company(
     service: CompanyServiceDep,
     current_user_admin=Depends(current_user_admin),
 ):
-    created_company = await service.create(company)
-    return created_company
+    return await service.create(company)
 
 
 @router.get("/", response_model=list[CompanyResponse], status_code=status.HTTP_200_OK)
 async def get_companies(pagination: PaginatorDep, service: CompanyServiceDep):
-    companies = await service.get_all(pagination.limit, pagination.skip)
-    return companies
+    return await service.get_all(pagination.limit, pagination.skip)
 
 
 @router.get("/{company_id}", response_model=CompanyResponse, status_code=status.HTTP_200_OK)
@@ -38,8 +36,7 @@ async def update_company(
     company: Company = Depends(valid_company_id),
     current_user_admin=Depends(current_user_admin),
 ):
-    company_updated = await service.update_full(company, updated_company)
-    return company_updated
+    return await service.update_full(company, updated_company)
 
 
 @router.patch("/{company_id}", response_model=CompanyResponse, status_code=status.HTTP_200_OK)
@@ -49,8 +46,7 @@ async def partial_update_company(
     company: Company = Depends(valid_company_id),
     current_user_admin=Depends(current_user_admin),
 ):
-    updated_company = await service.update_partial(company, company_data)
-    return updated_company
+    return await service.update_partial(company, company_data)
 
 
 @router.delete("/{company_id}", status_code=status.HTTP_204_NO_CONTENT)

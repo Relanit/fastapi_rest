@@ -50,7 +50,14 @@ async def test_create_asset_invalid_company(admin_client: AsyncClient):
 async def test_get_assets(admin_client: AsyncClient):
     response = await admin_client.get("/assets/")
     assert response.status_code == status.HTTP_200_OK
-    assert isinstance(response.json(), list)
+    assets = response.json()
+    assert isinstance(assets, list)
+    for asset in assets:
+        assert "ticker" in asset, f"Asset missing ticker: {asset}"
+        assert "description" in asset, f"Asset missing description: {asset}"
+        assert "available_count" in asset, f"Asset missing available_count: {asset}"
+        assert "price" in asset, f"Asset missing price: {asset}"
+        assert "company_id" in asset, f"Asset missing company_id: {asset}"
 
 
 @pytest.mark.dependency(depends=["test_create_asset"])

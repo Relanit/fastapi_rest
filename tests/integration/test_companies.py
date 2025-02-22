@@ -51,7 +51,7 @@ async def test_get_nonexistent_company(admin_client: AsyncClient):
 @pytest.mark.dependency(depends=["test_create_company"])
 async def test_update_company(admin_client: AsyncClient):
     response = await admin_client.put(
-        f"/companies/1",
+        "/companies/1",
         json={"name": "Updated Company", "profile": "Updated profile", "foundation_date": "1990-01-01"},
     )
     assert response.status_code == status.HTTP_200_OK
@@ -63,7 +63,7 @@ async def test_update_company(admin_client: AsyncClient):
 
 @pytest.mark.dependency(depends=["test_create_company"])
 async def test_partial_update_company(admin_client: AsyncClient):
-    response = await admin_client.patch(f"/companies/1", json={"profile": "New profile"})
+    response = await admin_client.patch("/companies/1", json={"profile": "New profile"})
     assert response.status_code == status.HTTP_200_OK
     response = await admin_client.get("/companies/1")
     assert response.status_code == status.HTTP_200_OK

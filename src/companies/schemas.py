@@ -13,7 +13,7 @@ class CompanyBase(BaseModel):
         if not value:
             raise ValueError("Название компании должно содержать от 2 до 100 символов.")
         value = value.strip()
-        if not (1 < len(value) < 100):
+        if not (2 <= len(value) <= 100):
             raise ValueError("Название компании должно содержать от 2 до 100 символов.")
         return value.title()
 
@@ -24,8 +24,8 @@ class CompanyBase(BaseModel):
         if isinstance(value, str):
             try:
                 value = datetime.strptime(value, "%Y-%m-%d").date()
-            except ValueError:
-                raise ValueError("Неверный формат даты. Используйте 'YYYY-MM-DD'.")
+            except ValueError as e:
+                raise ValueError("Неверный формат даты. Используйте 'YYYY-MM-DD'.") from e
         if value > date.today():
             raise ValueError("Дата основания не может быть в будущем.")
         return value

@@ -48,10 +48,12 @@ class AssetService:
         search_terms = search_query.split()
         name_conditions = [Asset.name.ilike(f"%{term}%") for term in search_terms]
         company_conditions = [Company.name.ilike(f"%{term}%") for term in search_terms]
+
         name_cases = [(Asset.name.ilike(f"%{term}%"), 1) for term in search_terms]
         company_cases = [(Company.name.ilike(f"%{term}%"), 1) for term in search_terms]
         name_match_score = case(*name_cases, else_=0)
         company_match_score = case(*company_cases, else_=0)
+
         query = (
             select(Asset)
             .join(Company)

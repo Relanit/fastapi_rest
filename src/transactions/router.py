@@ -5,7 +5,7 @@ from auth.auth import current_user_admin, current_user
 from transactions.exceptions import TransactionsAccessForbidden
 from transactions.schemas import TransactionResponse, TransactionCreate, TransactionUpdate, TransactionPatchUpdate
 from transactions.dependencies import TransactionServiceDep, valid_transaction_id
-from models import Transaction, User
+from models import Transaction, User, ADMIN_ROLE_ID
 from pagination import PaginatorDep
 
 
@@ -18,8 +18,7 @@ async def create_transaction(
     service: TransactionServiceDep,
     current_user: User = Depends(current_user),
 ):
-    created_transaction = await service.create(transaction, current_user)
-    return created_transaction
+    return await service.create(transaction, current_user)
 
 
 @router.get("/", response_model=list[TransactionResponse], status_code=status.HTTP_200_OK)
@@ -29,10 +28,10 @@ async def get_transactions(
     user_id: int | None = None,
     current_user: User = Depends(current_user),
 ):
-    if user_id is not None and user_id != current_user.id and not current_user.role_id == 2:
+    if (user_id is None or current_user.id != user_id) and current_user.role_id != ADMIN_ROLE_ID:
         raise TransactionsAccessForbidden()
-    transactions = await service.get_all(pagination.limit, pagination.skip, user_id)
-    return transactions
+
+    return await service.get_all(pagination.limit, pagination.skip, user_id)
 
 
 @router.get("/{transaction_id}", response_model=TransactionResponse, status_code=status.HTTP_200_OK)
@@ -49,8 +48,7 @@ async def update_transaction(
     transaction: Transaction = Depends(valid_transaction_id),
     current_user_admin=Depends(current_user_admin),
 ):
-    transaction_updated = await service.update_full(transaction, updated_transaction)
-    return transaction_updated
+    return await service.update_full(transaction, updated_transaction)
 
 
 @router.patch("/{transaction_id}", response_model=TransactionResponse, status_code=status.HTTP_200_OK)
@@ -60,8 +58,7 @@ async def partial_update_transaction(
     transaction: Transaction = Depends(valid_transaction_id),
     current_user_admin=Depends(current_user_admin),
 ):
-    updated_transaction = await service.update_partial(transaction, transaction_data)
-    return updated_transaction
+    return await service.update_partial(transaction, transaction_data)
 
 
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
