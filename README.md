@@ -27,7 +27,7 @@ docker compose up -d
 
 ## Запуск тестов
 ```bash
-docker compose --env-file .env.test exec app pytest -v -s
+docker compose exec app pytest -v -s
 ```
 
 

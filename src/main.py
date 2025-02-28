@@ -17,7 +17,6 @@ from companies.router import router as router_companies
 from assets.router import router as router_assets
 from transactions.router import router as router_transactions
 from balance.router import router as router_balance
-from pages.router import router as router_pages
 
 
 @asynccontextmanager
@@ -79,7 +78,18 @@ app.include_router(
     tags=["auth"],
 )
 
-app.include_router(router_pages)
+app.include_router(
+    fastapi_users.get_verify_router(UserRead),
+    prefix="/auth",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+
 app.include_router(router_companies)
 app.include_router(router_assets)
 app.include_router(router_transactions)

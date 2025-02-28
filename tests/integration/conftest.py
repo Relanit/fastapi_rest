@@ -13,12 +13,11 @@ from models import User
 from database import get_async_session, Base
 from main import app
 
-load_dotenv(".env.test")
-
+load_dotenv(".env.test", override=True)
 
 url = (
-    f"postgresql+asyncpg://{os.getenv('DB_USER_TEST')}:{os.getenv('DB_PASS_TEST')}@"
-    f"{os.getenv('DB_HOST_TEST')}:{os.getenv('DB_PORT_TEST')}/{os.getenv('DB_NAME_TEST')}"
+    f"postgresql+asyncpg://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@"
+    f"{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 )
 engine_test = create_async_engine(url)
 async_session_maker = async_sessionmaker(engine_test, expire_on_commit=False)
