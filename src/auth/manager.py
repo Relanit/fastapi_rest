@@ -8,6 +8,7 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import config
+from logger import logger
 from mail import create_message, mail
 from models import User, USER_ROLE_ID
 from auth.utils import get_user_db
@@ -28,30 +29,30 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         self.session = session
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
-        print(f"User {user.id} has registered.")
+        logger.debug(f"User {user.id} has registered.")
         if user.id == 1:
             stmt = update(User).where(User.id == 1).values(role_id=2, is_superuser=True)
             await self.session.execute(stmt)
             await self.session.commit()
-            print("Added admin")
+            logger.debug("Added admin")
 
     async def on_after_request_verify(self, user: User, token: str, request: Optional[Request] = None) -> None:
-        print(f"Verification requested for user {user.id}. Verification token: {token}")
+        logger.debug(f"Verification requested for user {user.id}. Verification token: {token}")
         html = f"<h1>Confirm your email</h1>Temporary token: <b>{token}</b>"
         message = create_message(recipients=[user.email], subject="Email confirmation", body=html)
         await mail.send_message(message)
 
     async def on_after_verify(self, user: User, request: Optional[Request] = None):
-        print(f"User {user.id} has been verified")
+        logger.debug(f"User {user.id} has been verified")
 
     async def on_after_forgot_password(self, user: User, token: str, request: Optional[Request] = None) -> None:
-        print(f"Password reset requested for user {user.id}. Temporary token: {token}")
+        logger.debug(f"Password reset requested for user {user.id}. Temporary token: {token}")
         html = f"<h1>Reset password</h1>Temporary token: <b>{token}</b>"
         message = create_message(recipients=[user.email], subject="Reset password", body=html)
         await mail.send_message(message)
 
     async def on_after_reset_password(self, user: User, request: Optional[Request] = None) -> None:
-        print(f"User {user.id} have reset their password")
+        logger.debug(f"User {user.id} have reset their password")
 
     async def create(
         self,
