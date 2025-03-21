@@ -9,8 +9,8 @@ from assets.exceptions import AssetNotFound
 from transactions.exceptions import UserNotFound, AssetNotAvailable, TransactionNotFound, InsufficientFunds, \
     UserMismatch, TransactionAmountMismatch
 from transactions.schemas import TransactionCreate, TransactionUpdate, TransactionPatchUpdate
-from database import get_async_session
-from models import User, Asset, Transaction
+from database.database import get_async_session
+from database.models import User, Asset, Transaction
 
 
 class TransactionService:

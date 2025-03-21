@@ -3,7 +3,7 @@ from fastapi import status
 from httpx import AsyncClient
 from sqlalchemy import insert, select
 
-from models import Role
+from database.models import Role
 from conftest import async_session_maker
 
 

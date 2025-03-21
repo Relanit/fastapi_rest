@@ -4,7 +4,7 @@ from fastapi import status
 from auth.auth import current_user_admin
 from companies.dependencies import valid_company_id, CompanyServiceDep
 from companies.schemas import CompanyCreate, CompanyUpdate, CompanyResponse, CompanyPatchUpdate
-from models import Company
+from database.models import Company
 from pagination import PaginatorDep
 
 router = APIRouter(prefix="/companies", tags=["Company"])

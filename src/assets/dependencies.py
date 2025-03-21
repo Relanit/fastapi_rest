@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 
 from assets.exceptions import AssetNotFound
-from models import Asset
+from database.models import Asset
 from assets.service import AssetService
 
 AssetServiceDep = Annotated[AssetService, Depends(AssetService)]

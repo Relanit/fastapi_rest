@@ -5,7 +5,7 @@ from auth.auth import current_user_admin, current_user
 from transactions.exceptions import TransactionsAccessForbidden
 from transactions.schemas import TransactionResponse, TransactionCreate, TransactionUpdate, TransactionPatchUpdate
 from transactions.dependencies import TransactionServiceDep, valid_transaction_id
-from models import Transaction, User, ADMIN_ROLE_ID
+from database.models import Transaction, User, ADMIN_ROLE_ID
 from pagination import PaginatorDep
 
 

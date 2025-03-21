@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
-from models import User
-from database import get_async_session
+from database.models import User
+from database.database import get_async_session
 
 
 class BalanceService:

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from .schemas import TopUpBalanceRequest
-from models import User
+from database.models import User
 from .dependencies import BalanceServiceDep
 from auth.auth import current_user
 

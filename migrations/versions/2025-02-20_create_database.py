@@ -12,7 +12,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import orm
 
-from models import Role
+from database.models import Role
 
 # revision identifiers, used by Alembic.
 revision: str = "f2a93ab11833"
@@ -40,12 +40,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_role_id"), "role", ["id"], unique=False)
-
-    bind = op.get_bind()
-    session = orm.Session(bind=bind)
-    session.add_all([Role(name="user", permissions={}), Role(name="admin", permissions={})])
-    session.commit()
-
     op.create_table(
         "asset",
         sa.Column("id", sa.Integer(), nullable=False),

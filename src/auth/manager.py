@@ -10,9 +10,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config import config
 from logger import logger
 from mail import create_message, mail
-from models import User, USER_ROLE_ID
+from database.models import User, USER_ROLE_ID
 from auth.utils import get_user_db
-from database import get_async_session
+from database.database import get_async_session
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):

@@ -1,4 +1,3 @@
-import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -10,7 +9,7 @@ from redis import asyncio as aioredis
 
 from auth.auth import auth_backend, fastapi_users, current_user
 from config import config
-from models import User
+from database.models import User
 from auth.schemas import UserRead, UserCreate
 from companies.router import router as router_companies
 from assets.router import router as router_assets

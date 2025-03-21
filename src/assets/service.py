@@ -5,9 +5,9 @@ from fastapi import Depends
 
 from assets.exceptions import AssetNotFound
 from companies.exceptions import CompanyNotFound
-from models import Asset, Company
+from database.models import Asset, Company
 from .schemas import AssetCreate, AssetUpdate, AssetPatchUpdate
-from database import get_async_session
+from database.database import get_async_session
 
 
 class AssetService:

@@ -4,7 +4,7 @@ from fastapi import Depends
 
 from companies.exceptions import CompanyNotFound
 from companies.service import CompanyService
-from models import Company
+from database.models import Company
 
 CompanyServiceDep = Annotated[CompanyService, Depends(CompanyService)]
 

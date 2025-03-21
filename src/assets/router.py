@@ -3,7 +3,7 @@ from fastapi import status
 
 from auth.auth import current_user_admin
 from assets.dependencies import valid_asset_id, AssetServiceDep
-from models import Asset
+from database.models import Asset
 from assets.schemas import AssetCreate, AssetUpdate, AssetResponse, AssetPatchUpdate
 from pagination import PaginatorDep
 

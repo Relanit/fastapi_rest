@@ -9,8 +9,8 @@ from pytest_asyncio import is_async_test
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from auth.auth import current_user_admin, current_user
-from models import User
-from database import get_async_session, Base
+from database.models import User
+from database.database import get_async_session, Base
 from main import app
 
 load_dotenv(".env.test", override=True)

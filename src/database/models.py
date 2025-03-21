@@ -5,7 +5,7 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import text, ForeignKey, String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
-from database import Base, intpk
+from database.database import Base, intpk
 
 
 USER_ROLE_ID = 1

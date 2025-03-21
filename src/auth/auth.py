@@ -4,7 +4,7 @@ from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import CookieTransport, JWTStrategy, AuthenticationBackend
 
 from .manager import get_user_manager
-from models import User, ADMIN_ROLE_ID
+from database.models import User, ADMIN_ROLE_ID
 from config import config
 
 cookie_transport = CookieTransport(cookie_name="library", cookie_max_age=3600)

@@ -4,7 +4,7 @@ from fastapi import Depends
 
 from transactions.exceptions import TransactionNotFound
 from transactions.service import TransactionService
-from models import Transaction
+from database.models import Transaction
 
 TransactionServiceDep = Annotated[TransactionService, Depends(TransactionService)]
 

@@ -4,9 +4,9 @@ from typing import Sequence
 from fastapi import Depends
 
 from companies.exceptions import CompanyAlreadyExists
-from models import Company
+from database.models import Company
 from .schemas import CompanyCreate, CompanyUpdate, CompanyPatchUpdate
-from database import get_async_session
+from database.database import get_async_session
 
 
 class CompanyService:
