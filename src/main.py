@@ -7,7 +7,6 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi.middleware.cors import CORSMiddleware
 from redis import asyncio as aioredis
-from fastapi.staticfiles import StaticFiles
 
 from auth.auth import auth_backend, fastapi_users, current_user
 from config import config
@@ -27,13 +26,6 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Invest app", lifespan=lifespan)
-
-app.mount(
-    "/static",
-    StaticFiles(directory="static" if "uvicorn" in sys.argv[0] or "gunicorn" in sys.argv[0] else "src/static"),
-    name="static",
-)
-
 
 origins = ["http://localhost:3000"]
 
