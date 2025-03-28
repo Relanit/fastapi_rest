@@ -1,3 +1,7 @@
+import os
+from pathlib import Path
+
+from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -12,7 +16,6 @@ class Config(BaseSettings):
     REDIS_PORT: str
 
     SECRET: str
-
     DEBUG: bool
 
     MAIL_USERNAME: str | None = None
@@ -25,6 +28,10 @@ class Config(BaseSettings):
     MAIL_SSL_TLS: bool = False
     USE_CREDENTIALS: bool = True
     VALIDATE_CERTS: bool = True
+
+    model_config = ConfigDict(
+        env_file=Path("") if os.getenv("DOCKER_ENV", "").lower() == "true" else ".env.dev", env_file_encoding="utf-8"
+    )
 
 
 config = Config()

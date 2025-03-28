@@ -1,11 +1,5 @@
-from pydantic import field_validator, BaseModel
+from pydantic import BaseModel, condecimal
 
 
 class TopUpBalanceRequest(BaseModel):
-    amount: float
-
-    @field_validator("amount")
-    def amount_must_be_positive(cls, value: float) -> float:
-        if value <= 0:
-            raise ValueError("Сумма должна быть положительной")
-        return value
+    amount: condecimal(gt=0)

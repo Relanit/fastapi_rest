@@ -1,7 +1,12 @@
+import json
+from decimal import Decimal
+
 import pytest
 from httpx import AsyncClient
 
 from fastapi import status
+
+from utils import DecimalEncoder
 
 
 @pytest.mark.dependency()
@@ -12,10 +17,11 @@ async def test_create_asset(client: AsyncClient):
         "ticker": "TST",
         "description": "A test asset description.",
         "available_count": 100,
-        "price": 50.5,
+        "price": Decimal("50.50"),
         "company_id": 1,
     }
-    response = await client.post("/assets/", json=asset_data)
+    json_asset = json.dumps(asset_data, cls=DecimalEncoder)
+    response = await client.post("/assets/", content=json_asset, headers={"Content-Type": "application/json"})
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
     assert data["name"] == asset_data["name"]
@@ -27,10 +33,11 @@ async def test_create_asset(client: AsyncClient):
         "ticker": "TST2",
         "description": "Another test asset.",
         "available_count": 200,
-        "price": 75.0,
+        "price": Decimal("75.00"),
         "company_id": 1,
     }
-    await client.post("/assets/", json=asset_data)
+    json_asset = json.dumps(asset_data, cls=DecimalEncoder)
+    await client.post("/assets/", content=json_asset, headers={"Content-Type": "application/json"})
 
 
 async def test_create_asset_invalid_company(admin_client: AsyncClient):
@@ -40,10 +47,11 @@ async def test_create_asset_invalid_company(admin_client: AsyncClient):
         "ticker": "INV",
         "description": "Invalid asset for testing.",
         "available_count": 50,
-        "price": 30.0,
+        "price": Decimal("30.00"),
         "company_id": 999,
     }
-    response = await admin_client.post("/assets/", json=asset_data)
+    json_asset = json.dumps(asset_data, cls=DecimalEncoder)
+    response = await admin_client.post("/assets/", content=json_asset)
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
@@ -94,9 +102,10 @@ async def test_update_asset(admin_client: AsyncClient):
         "ticker": "UPDT",
         "description": "Updated asset description.",
         "available_count": 150,
-        "price": 60.0,
+        "price": Decimal("60.00"),
     }
-    response = await admin_client.put("/assets/1", json=updated_data)
+    json_asset = json.dumps(updated_data, cls=DecimalEncoder)
+    response = await admin_client.put("/assets/1", content=json_asset)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["name"] == updated_data["name"]

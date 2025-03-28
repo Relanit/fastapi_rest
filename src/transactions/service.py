@@ -20,17 +20,15 @@ class TransactionService:
     async def valid_user_id(self, user_id: int) -> User:
         query = select(User).where(User.id == user_id)
         result = await self.session.execute(query)
-        user = result.scalar_one_or_none()
-        if not user:
-            raise UserNotFound()
-        return user
+        if user := result.scalar_one_or_none():
+            return user
+        raise UserNotFound()
 
     async def valid_asset_id(self, asset_id: int) -> Asset:
         result = await self.session.execute(select(Asset).where(Asset.id == asset_id))
-        asset = result.scalar_one_or_none()
-        if not asset:
-            raise AssetNotFound()
-        return asset
+        if asset := result.scalar_one_or_none():
+            return asset
+        raise AssetNotFound()
 
     async def create(self, transaction: TransactionCreate, user: User) -> Transaction:
         if transaction.user_id != user.id:

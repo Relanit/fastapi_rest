@@ -1,8 +1,8 @@
 """create database
 
-Revision ID: f2a93ab11833
+Revision ID: 27c0aac26acd
 Revises: 
-Create Date: 2025-02-20 17:45:26.892314
+Create Date: 2025-03-28 16:23:57.518706
 
 """
 
@@ -15,7 +15,7 @@ from sqlalchemy import orm
 from database.models import Role
 
 # revision identifiers, used by Alembic.
-revision: str = "f2a93ab11833"
+revision: str = "27c0aac26acd"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -49,7 +49,7 @@ def upgrade() -> None:
         sa.Column("ticker", sa.String(), nullable=False),
         sa.Column("description", sa.String(), nullable=True),
         sa.Column("available_count", sa.Integer(), nullable=False),
-        sa.Column("price", sa.Float(), nullable=False),
+        sa.Column("price", sa.DECIMAL(precision=10, scale=2), nullable=False),
         sa.ForeignKeyConstraint(
             ["company_id"],
             ["company.id"],
@@ -68,7 +68,7 @@ def upgrade() -> None:
         sa.Column("is_active", sa.Boolean(), nullable=False),
         sa.Column("is_superuser", sa.Boolean(), nullable=False),
         sa.Column("is_verified", sa.Boolean(), nullable=False),
-        sa.Column("balance", sa.Float(), nullable=False),
+        sa.Column("balance", sa.DECIMAL(precision=10, scale=2), nullable=False),
         sa.ForeignKeyConstraint(
             ["role_id"],
             ["role.id"],
@@ -85,7 +85,7 @@ def upgrade() -> None:
         sa.Column("purchase_date", sa.Date(), nullable=False),
         sa.Column("target_sell_date", sa.Date(), nullable=False),
         sa.Column("sell_date", sa.Date(), nullable=True),
-        sa.Column("amount", sa.Float(), nullable=False),
+        sa.Column("amount", sa.DECIMAL(precision=10, scale=2), nullable=False),
         sa.ForeignKeyConstraint(
             ["asset_id"],
             ["asset.id"],

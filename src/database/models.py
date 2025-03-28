@@ -1,8 +1,9 @@
 from datetime import datetime, date
+from decimal import Decimal
 from typing import Any, List, Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import text, ForeignKey, String
+from sqlalchemy import text, ForeignKey, String, DECIMAL
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from database.database import Base, intpk
@@ -31,7 +32,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_active: Mapped[bool] = mapped_column(default=True)
     is_superuser: Mapped[bool] = mapped_column(default=False)
     is_verified: Mapped[bool] = mapped_column(default=False)
-    balance: Mapped[float] = mapped_column(default=0.0)
+    balance: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=2), default=Decimal("0.00"))
     role: Mapped[Role] = relationship("Role", lazy="selectin")
 
     transactions = relationship("Transaction", back_populates="user", lazy="selectin")
@@ -55,7 +56,7 @@ class Asset(Base):
     ticker: Mapped[str] = mapped_column(unique=True)
     description: Mapped[Optional[str]]
     available_count: Mapped[int] = mapped_column(default=0)
-    price: Mapped[float]
+    price: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=2))
     company: Mapped["Company"] = relationship("Company", back_populates="assets", lazy="selectin")
 
 
@@ -67,7 +68,7 @@ class Transaction(Base):
     purchase_date: Mapped[date]
     target_sell_date: Mapped[date]
     sell_date: Mapped[date] = mapped_column(nullable=True)
-    amount: Mapped[float]
+    amount: Mapped[Decimal] = mapped_column(DECIMAL(precision=10, scale=2))
 
     user: Mapped["User"] = relationship("User", back_populates="transactions", lazy="selectin")
     asset: Mapped["Asset"] = relationship("Asset")

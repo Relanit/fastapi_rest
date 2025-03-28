@@ -1,5 +1,6 @@
 import asyncio
 from datetime import date
+from decimal import Decimal
 
 from sqlalchemy import select, func
 
@@ -44,7 +45,7 @@ async def seed_database():
                     "ticker": "AAPL",
                     "description": "Акции Apple Inc.",
                     "available_count": 1000,
-                    "price": 150.0,
+                    "price": Decimal("150.00"),
                 },
                 {
                     "name": "Google акции",
@@ -53,7 +54,7 @@ async def seed_database():
                     "ticker": "GOOGL",
                     "description": "Акции Alphabet Inc.",
                     "available_count": 500,
-                    "price": 2500.0,
+                    "price": Decimal("2500.00"),
                 },
                 {
                     "name": "Microsoft акции",
@@ -62,7 +63,7 @@ async def seed_database():
                     "ticker": "MSFT",
                     "description": "Акции Microsoft Corp.",
                     "available_count": 750,
-                    "price": 300.0,
+                    "price": Decimal("300.00"),
                 },
                 {
                     "name": "Tesla акции",
@@ -71,7 +72,7 @@ async def seed_database():
                     "ticker": "TSLA",
                     "description": "Акции Tesla Inc.",
                     "available_count": 200,
-                    "price": 700.0,
+                    "price": Decimal("700.00"),
                 },
                 {
                     "name": "S&P 500 ETF",
@@ -80,7 +81,7 @@ async def seed_database():
                     "ticker": "SPY",
                     "description": "SPDR S&P 500 ETF Trust",
                     "available_count": 2000,
-                    "price": 450.0,
+                    "price": Decimal("450.00"),
                 },  # ETF, для примера привязан к Apple, компанию можно сделать "Индексы" или "ETF провайдеры"
                 {
                     "name": "Золото",
@@ -89,7 +90,7 @@ async def seed_database():
                     "ticker": "GOLD",
                     "description": "Золото (унция)",
                     "available_count": 5000,
-                    "price": 1800.0,
+                    "price": Decimal("1800.00"),
                 },  # Золото, для примера привязано к Google, компанию можно сделать "Сырьевые товары"
             ]
 

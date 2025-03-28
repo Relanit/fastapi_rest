@@ -1,5 +1,7 @@
 import unittest
 from datetime import date
+from decimal import Decimal
+
 from pydantic import ValidationError
 from assets.schemas import AssetBase
 
@@ -14,9 +16,9 @@ class TestAssetBase(unittest.TestCase):
                 ticker="ASSET1",
                 description="A valid description.",
                 available_count=10,
-                price=100.0
+                price=Decimal("100.00"),
             )
-        self.assertIn("Название актива должно содержать хотя бы 1 символ", str(context.exception))
+        self.assertIn("type=string_too_short", str(context.exception))
 
     def test_future_listed_year(self):
         current_year = date.today().year
@@ -28,9 +30,9 @@ class TestAssetBase(unittest.TestCase):
                 ticker="ASSET1",
                 description="A valid description.",
                 available_count=10,
-                price=100.0
+                price=Decimal("100.00"),
             )
-        self.assertIn("Год листинга не может быть в будущем", str(context.exception))
+        self.assertIn("type=less_than_equal", str(context.exception))
 
     def test_invalid_available_count(self):
         with self.assertRaises(ValidationError) as context:
@@ -41,9 +43,9 @@ class TestAssetBase(unittest.TestCase):
                 ticker="ASSET1",
                 description="A valid description.",
                 available_count=-1,
-                price=100.0
+                price=Decimal("100.00"),
             )
-        self.assertIn("Количество доступных единиц должно быть неотрицательным", str(context.exception))
+        self.assertIn("type=greater_than_equal", str(context.exception))
 
     def test_invalid_price(self):
         with self.assertRaises(ValidationError) as context:
@@ -54,9 +56,9 @@ class TestAssetBase(unittest.TestCase):
                 ticker="ASSET1",
                 description="A valid description.",
                 available_count=10,
-                price=0
+                price=Decimal("0"),
             )
-        self.assertIn("Цена должна быть положительной", str(context.exception))
+        self.assertIn("type=greater_than", str(context.exception))
 
     def test_valid_asset(self):
         asset = AssetBase(
@@ -66,12 +68,11 @@ class TestAssetBase(unittest.TestCase):
             ticker="ASSET1",
             description="A valid description.",
             available_count=10,
-            price=100.0
+            price=Decimal("100.00"),
         )
         self.assertEqual(asset.available_count, 10)
-        self.assertEqual(asset.price, 100.0)
+        self.assertEqual(asset.price, Decimal("100.00"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
-

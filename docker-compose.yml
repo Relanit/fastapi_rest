@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17
-    container_name: db_app
+    container_name: db_fastapi_rest
     command: -p 2222
     expose:
       - "2222"
@@ -10,7 +10,7 @@ services:
 
   test_db:
     image: postgres:17
-    container_name: test_db_app
+    container_name: test_db_fastapi_rest
     command: -p 5433
     expose:
       - "5433"
@@ -19,7 +19,7 @@ services:
 
   redis:
     image: redis:7
-    container_name: redis_app
+    container_name: redis_fastapi_rest
     command: --port 5370
     expose:
       - "5370"
@@ -27,6 +27,8 @@ services:
   app:
     build:
       context: .
+    environment:
+      - DOCKER_ENV=true
     env_file:
       - .env.prod
     container_name: fastapi_rest

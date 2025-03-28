@@ -1,4 +1,5 @@
 import os
+from decimal import Decimal
 from typing import AsyncGenerator, Annotated, TypeVar, get_args, Callable, Awaitable
 
 import pytest
@@ -89,14 +90,18 @@ async def session_fixture() -> AsyncGenerator[AsyncSession, None]:
 @pytest.fixture(scope="session")
 async def admin_client(get_admin_client: GetAdminClient, session_fixture):
     user = User(
-        username="admin", email="admin@test.com", hashed_password="test", role_id=2, is_superuser=True, balance=1000.0
+        username="admin",
+        email="admin@test.com",
+        hashed_password="test",
+        role_id=2,
+        is_superuser=True,
+        balance=Decimal("1000.00"),
     )
     async with session_fixture as session:
         session.add(user)
         await session.commit()
 
-    client = await get_admin_client(user)
-    return client
+    return await get_admin_client(user)
 
 
 def pytest_collection_modifyitems(session, items):

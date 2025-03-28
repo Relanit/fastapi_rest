@@ -16,10 +16,9 @@ class AssetService:
 
     async def valid_company_id(self, company_id: int) -> Company:
         result = await self.session.execute(select(Company).where(Company.id == company_id))
-        company = result.scalar_one_or_none()
-        if not company:
-            raise CompanyNotFound()
-        return company
+        if company := result.scalar_one_or_none():
+            return company
+        raise CompanyNotFound()
 
     async def create(self, asset: AssetCreate) -> Asset:
         await self.valid_company_id(asset.company_id)
