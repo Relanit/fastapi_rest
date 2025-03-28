@@ -18,12 +18,12 @@ class Config(BaseSettings):
     SECRET: str
     DEBUG: bool
 
-    MAIL_USERNAME: str | None = None
-    MAIL_PASSWORD: str | None = None
-    MAIL_FROM: str | None = None
-    MAIL_PORT: int | None = None
-    MAIL_SERVER: str | None = None
-    MAIL_FROM_NAME: str | None = None
+    MAIL_USERNAME: str = ""
+    MAIL_PASSWORD: str = ""
+    MAIL_FROM: str = ""
+    MAIL_PORT: int = 0
+    MAIL_SERVER: str = ""
+    MAIL_FROM_NAME: str = ""
     MAIL_STARTTLS: bool = True
     MAIL_SSL_TLS: bool = False
     USE_CREDENTIALS: bool = True
