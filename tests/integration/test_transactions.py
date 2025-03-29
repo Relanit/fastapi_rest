@@ -30,7 +30,10 @@ async def test_create_transaction(client: AsyncClient):
     assert response.json()["user_id"] == transaction_data["user_id"]
     assert response.json()["asset_id"] == transaction_data["asset_id"]
     assert response.json()["purchase_date"] == transaction_data["purchase_date"]
-    assert response.json()["amount"] == transaction_data["amount"]
+
+    response_amount_decimal = Decimal(response.json()["amount"])
+    transaction_amount_decimal = Decimal(transaction_data["amount"])
+    assert response_amount_decimal == transaction_amount_decimal
 
 
 async def test_get_all_transactions(admin_client: AsyncClient):
@@ -71,7 +74,10 @@ async def test_update_transaction(admin_client: AsyncClient):
     response = await admin_client.put(f"/transactions/{transaction_id}", content=json_transaction)
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["target_sell_date"] == updated_data["target_sell_date"]
-    assert response.json()["amount"] == updated_data["amount"]
+
+    response_amount_decimal = Decimal(response.json()["amount"])
+    updated_amount_decimal = Decimal(updated_data["amount"])
+    assert response_amount_decimal == updated_amount_decimal
 
 
 @pytest.mark.dependency(depends=["test_create_transaction"])
