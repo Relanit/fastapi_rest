@@ -1,15 +1,12 @@
-from datetime import date, timedelta
+from datetime import datetime, timezone
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, conint, condecimal
+from pydantic import BaseModel, conint, condecimal, field_validator
 
 
 class TransactionBase(BaseModel):
-    user_id: conint(ge=0)
     asset_id: conint(ge=0)
-    purchase_date: date = Field(default_factory=date.today, le=date.today())
-    target_sell_date: date = Field(default_factory=lambda: date.today() + timedelta(days=30), gt=date.today())
-    amount: condecimal(gt=0, max_digits=10, decimal_places=2)
+    amount: condecimal(gt=0, max_digits=20, decimal_places=10)
 
 
 class TransactionCreate(TransactionBase):
@@ -17,18 +14,28 @@ class TransactionCreate(TransactionBase):
 
 
 class TransactionUpdate(TransactionBase):
-    sell_date: date | None
+    pass
 
 
 class TransactionPatchUpdate(BaseModel):
     user_id: int | None = None
     asset_id: int | None = None
-    purchase_date: date | None = None
-    target_sell_date: date | None = None
+    purchase_datetime: datetime | None = None
     amount: Decimal | None = None
-    sell_date: date | None = None
+    total_value: Decimal | None = None
+
+    @field_validator("purchase_datetime")
+    def check_purchase_datetime(cls, value: datetime) -> datetime | None:
+        if value is None:
+            return None
+
+        if value > datetime.now(timezone.utc):
+            raise ValueError("purchase_datetime не может быть в будущем")
+        return value
 
 
 class TransactionResponse(TransactionBase):
     id: int
-    sell_date: date | None
+    user_id: int
+    purchase_datetime: datetime
+    total_value: Decimal

@@ -17,7 +17,7 @@ async def seed_database():
                 logger.info("Database already seeded, skipping seeding.")
                 return
 
-            db.add_all([Role(name="user", permissions={}), Role(name="admin", permissions={})])
+            db.add_all([Role(name="users", permissions={}), Role(name="admin", permissions={})])
 
             apple = Company(name="Apple", profile="Tech company...", foundation_date=date.fromisoformat("1976-04-01"))
             google = Company(

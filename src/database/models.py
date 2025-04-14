@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import Any, List, Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
+from pydantic import EmailStr
 from sqlalchemy import text, ForeignKey, String, DECIMAL, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
@@ -25,7 +26,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     __tablename__ = "user"
     id: Mapped[intpk]
     username: Mapped[str]
-    email: Mapped[str] = mapped_column(String(length=320), unique=True, index=True)
+    email: Mapped[EmailStr] = mapped_column(String(length=320), unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String(length=1024))
     role_id: Mapped[int] = mapped_column(ForeignKey("role.id"))
     created_at: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
@@ -89,10 +90,11 @@ class Transaction(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     asset_id: Mapped[int] = mapped_column(ForeignKey("asset.id"))
-    purchase_date: Mapped[date]
-    target_sell_date: Mapped[date]
-    sell_date: Mapped[date] = mapped_column(nullable=True)
-    amount: Mapped[Decimal] = mapped_column(DECIMAL(precision=20, scale=10))  # Сумма транзакции в USD (долларах США)
+    purchase_datetime: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
+    amount: Mapped[Decimal] = mapped_column(DECIMAL(precision=20, scale=10))  # Количество актива
+    total_value: Mapped[Decimal] = mapped_column(
+        DECIMAL(precision=20, scale=10)
+    )  # Сумма транзакции в USD (долларах США)
 
     user: Mapped["User"] = relationship("User", back_populates="transactions", lazy="selectin")
     asset: Mapped["Asset"] = relationship("Asset")

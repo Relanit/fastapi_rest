@@ -1,4 +1,3 @@
-import math
 from typing import Sequence
 
 from fastapi import Depends
@@ -6,11 +5,16 @@ from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from assets.exceptions import AssetNotFound
-from transactions.exceptions import UserNotFound, AssetNotAvailable, TransactionNotFound, InsufficientFunds, \
-    UserMismatch, TransactionAmountMismatch
+from transactions.exceptions import (
+    UserNotFound,
+    AssetNotAvailable,
+    TransactionNotFound,
+    InsufficientFunds,
+    UserMismatch,
+)
 from transactions.schemas import TransactionCreate, TransactionUpdate, TransactionPatchUpdate
 from database.database import get_async_session
-from database.models import User, Asset, Transaction
+from database.models import User, Asset, Transaction, UserAsset
 
 
 class TransactionService:
@@ -31,34 +35,36 @@ class TransactionService:
         raise AssetNotFound()
 
     async def create(self, transaction: TransactionCreate, user: User) -> Transaction:
-        if transaction.user_id != user.id:
-            raise UserMismatch()
-
         asset = await self.valid_asset_id(transaction.asset_id)
         if asset.available_count <= 0:
             raise AssetNotAvailable()
 
-        if not math.isclose(transaction.amount, asset.price, rel_tol=1e-9, abs_tol=1e-2):
-            raise TransactionAmountMismatch()
+        total_value = transaction.amount * asset.price
 
-        if user.balance < asset.price:
+        if user.balance < total_value:
             raise InsufficientFunds()
 
-        user.balance -= asset.price
-        asset.available_count -= 1
+        user.balance -= total_value
+        asset.available_count -= transaction.amount
 
-        stmt = insert(Transaction).values(**transaction.model_dump(), sell_date=None).returning(Transaction)
+        stmt = select(UserAsset).filter(UserAsset.user_id == user.id, UserAsset.asset_id == asset.id)
+        user_asset = await self.session.scalar(stmt)
+
+        if user_asset:
+            user_asset.amount += transaction.amount
+        else:
+            stmt = insert(UserAsset).values(user_id=user.id, asset_id=asset.id, amount=transaction.amount)
+            await self.session.execute(stmt)
+
+        stmt = insert(Transaction).values(**transaction.model_dump(), user_id=user.id, total_value=total_value).returning(Transaction)
         result = await self.session.execute(stmt)
         await self.session.merge(user)
         self.session.add(asset)
         await self.session.commit()
         return result.scalar_one()
 
-    async def get_all(self, limit: int, skip: int, user_id: int | None) -> Sequence[Transaction]:
+    async def get_all(self, limit: int, skip: int) -> Sequence[Transaction]:
         query = select(Transaction).limit(limit).offset(skip)
-        if user_id is not None:
-            await self.valid_user_id(user_id)
-            query = query.where(Transaction.user_id == user_id)
         result = await self.session.execute(query)
         return result.scalars().all()
 

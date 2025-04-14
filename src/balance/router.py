@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from .schemas import TopUpBalanceRequest
 from database.models import User
 from .dependencies import BalanceServiceDep
-from auth.auth import current_user
+from users.auth import current_user
 
 router = APIRouter(prefix="/balance", tags=["Balance"])
 

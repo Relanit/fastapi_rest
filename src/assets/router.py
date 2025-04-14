@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi import status
 
-from auth.auth import current_user_admin
+from users.auth import current_user_admin
 from assets.dependencies import valid_asset_id, AssetServiceDep
 from database.models import Asset
 from assets.schemas import AssetCreate, AssetUpdate, AssetResponse, AssetPatchUpdate

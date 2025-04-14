@@ -1,8 +1,8 @@
 """create database
 
-Revision ID: cee8fe06deb0
+Revision ID: 37e88be89619
 Revises: 
-Create Date: 2025-03-29 14:56:52.569451
+Create Date: 2025-04-14 17:34:41.178827
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "cee8fe06deb0"
+revision: str = "37e88be89619"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -80,10 +80,9 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("asset_id", sa.Integer(), nullable=False),
-        sa.Column("purchase_date", sa.Date(), nullable=False),
-        sa.Column("target_sell_date", sa.Date(), nullable=False),
-        sa.Column("sell_date", sa.Date(), nullable=True),
+        sa.Column("purchase_datetime", sa.DateTime(), server_default=sa.text("TIMEZONE('utc', now())"), nullable=False),
         sa.Column("amount", sa.DECIMAL(precision=20, scale=10), nullable=False),
+        sa.Column("total_value", sa.DECIMAL(precision=20, scale=10), nullable=False),
         sa.ForeignKeyConstraint(
             ["asset_id"],
             ["asset.id"],

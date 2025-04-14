@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends
 from fastapi import status
 
-from auth.auth import current_user_admin, current_user
-from transactions.exceptions import TransactionsAccessForbidden
+from users.auth import current_user_admin, current_user
 from transactions.schemas import TransactionResponse, TransactionCreate, TransactionUpdate, TransactionPatchUpdate
 from transactions.dependencies import TransactionServiceDep, valid_transaction_id
-from database.models import Transaction, User, ADMIN_ROLE_ID
+from database.models import Transaction, User
 from pagination import PaginatorDep
 
 
@@ -25,13 +24,9 @@ async def create_transaction(
 async def get_transactions(
     pagination: PaginatorDep,
     service: TransactionServiceDep,
-    user_id: int | None = None,
-    current_user: User = Depends(current_user),
+    current_user_admin: User = Depends(current_user_admin),
 ):
-    if (user_id is None or current_user.id != user_id) and current_user.role_id != ADMIN_ROLE_ID:
-        raise TransactionsAccessForbidden()
-
-    return await service.get_all(pagination.limit, pagination.skip, user_id)
+    return await service.get_all(pagination.limit, pagination.skip)
 
 
 @router.get("/{transaction_id}", response_model=TransactionResponse, status_code=status.HTTP_200_OK)

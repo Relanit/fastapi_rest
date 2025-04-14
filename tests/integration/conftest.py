@@ -9,7 +9,7 @@ from httpx import AsyncClient, ASGITransport
 from pytest_asyncio import is_async_test
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from auth.auth import current_user_admin, current_user
+from users.auth import current_user_admin, current_user
 from database.models import User
 from database.database import get_async_session, Base
 from main import app
@@ -63,7 +63,7 @@ CurrentUser = Annotated[User, Depends(current_user)]
 @pytest.fixture(scope="session")
 def get_admin_client():
     async def _authenticated_client(user: User) -> AsyncClient:
-        # Override the dependency to act as if a user is authenticated
+        # Override the dependency to act as if a users is authenticated
 
         dep = get_fastapi_dependency_from_annotation(AdminUser)
         app.dependency_overrides[dep] = lambda: user

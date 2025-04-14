@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi import status
 
-from auth.auth import current_user_admin
+from users.auth import current_user_admin
 from companies.dependencies import valid_company_id, CompanyServiceDep
 from companies.schemas import CompanyCreate, CompanyUpdate, CompanyResponse, CompanyPatchUpdate
 from database.models import Company

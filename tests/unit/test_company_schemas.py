@@ -1,5 +1,5 @@
 import unittest
-from datetime import date, timedelta
+from datetime import date, timedelta, timezone, datetime
 from pydantic import ValidationError
 from companies.schemas import CompanyBase, CompanyCreate, CompanyPatchUpdate
 
@@ -29,11 +29,11 @@ class TestCompanySchemas(unittest.TestCase):
         self.assertIn("type=date_from_datetime_parsing", str(context.exception))
 
     def test_company_base_invalid_foundation_date_future(self):
-        future_date = (date.today() + timedelta(days=1)).isoformat()
+        future_date = (datetime.now(timezone.utc).date() + timedelta(days=1)).isoformat()
         data = {"name": "John Doe", "foundation_date": future_date}
         with self.assertRaises(ValidationError) as context:
             CompanyBase(**data)
-        self.assertIn("type=less_than_equal", str(context.exception))
+        self.assertIn("foundation_date не может быть в будущем", str(context.exception))
 
     def test_company_create_valid(self):
         data = {"name": "John Doe", "foundation_date": "1980-01-01"}

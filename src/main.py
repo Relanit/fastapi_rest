@@ -1,20 +1,21 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi.middleware.cors import CORSMiddleware
 from redis import asyncio as aioredis
 
-from auth.auth import auth_backend, fastapi_users, current_user
+from users.auth import auth_backend, fastapi_users
 from config import config
-from database.models import User
-from auth.schemas import UserRead, UserCreate
-from companies.router import router as router_companies
-from assets.router import router as router_assets
-from transactions.router import router as router_transactions
-from balance.router import router as router_balance
+from users.schemas import UserRead, UserCreate
+from companies.router import router as companies_router
+from assets.router import router as assets_router
+from transactions.router import router as transactions_router
+from balance.router import router as balance_router
+from users.me_router import router as me_router
+from users.router import router as users_router
 
 
 @asynccontextmanager
@@ -42,46 +43,33 @@ app.add_middleware(
     ],
 )
 
-
-@app.get("/user", tags=["User"])
-def get_current_user(user: User = Depends(current_user)):
-    return UserRead(
-        id=user.id,
-        email=user.email,
-        username=user.username,
-        balance=user.balance,
-        role_id=user.role_id,
-        is_active=user.is_active,
-        is_superuser=user.is_superuser,
-        is_verified=user.is_verified,
-    )
-
-
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
     prefix="/auth/jwt",
-    tags=["auth"],
+    tags=["Auth"],
 )
 
 app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/auth",
-    tags=["auth"],
+    tags=["Auth"],
 )
 
 app.include_router(
     fastapi_users.get_verify_router(UserRead),
     prefix="/auth",
-    tags=["auth"],
+    tags=["Auth"],
 )
 
 app.include_router(
     fastapi_users.get_reset_password_router(),
     prefix="/auth",
-    tags=["auth"],
+    tags=["Auth"],
 )
 
-app.include_router(router_companies)
-app.include_router(router_assets)
-app.include_router(router_transactions)
-app.include_router(router_balance)
+app.include_router(me_router)
+app.include_router(balance_router)
+app.include_router(users_router)
+app.include_router(companies_router)
+app.include_router(assets_router)
+app.include_router(transactions_router)
