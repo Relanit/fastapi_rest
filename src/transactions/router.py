@@ -1,23 +1,14 @@
 from fastapi import APIRouter, Depends
 from fastapi import status
 
-from users.auth import current_user_admin, current_user
-from transactions.schemas import TransactionResponse, TransactionCreate, TransactionUpdate, TransactionPatchUpdate
+from users.auth import current_user_admin
+from transactions.schemas import TransactionResponse, TransactionUpdate, TransactionPatchUpdate
 from transactions.dependencies import TransactionServiceDep, valid_transaction_id
 from database.models import Transaction, User
 from pagination import PaginatorDep
 
 
 router = APIRouter(prefix="/transactions", tags=["Transaction"])
-
-
-@router.post("/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
-async def create_transaction(
-    transaction: TransactionCreate,
-    service: TransactionServiceDep,
-    current_user: User = Depends(current_user),
-):
-    return await service.create(transaction, current_user)
 
 
 @router.get("/", response_model=list[TransactionResponse], status_code=status.HTTP_200_OK)

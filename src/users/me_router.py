@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi import status
 
-from assets.schemas import AssetResponse
+from assets.schemas import UserAssetResponse
 from database.models import User
 
 from transactions.schemas import TransactionResponse
@@ -27,7 +27,7 @@ def get_current_user(user: User = Depends(current_user)):
     )
 
 
-@router.get("/assets", response_model=list[AssetResponse], status_code=status.HTTP_200_OK)
+@router.get("/assets", response_model=list[UserAssetResponse], status_code=status.HTTP_200_OK)
 async def get_assets(
     pagination: PaginatorDep,
     service: UserServiceDep,

@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from fastapi import status
+from pydantic import condecimal
 
-from users.auth import current_user_admin
+from transactions.dependencies import TransactionServiceDep
+from transactions.schemas import TransactionResponse
+from users.auth import current_user_admin, current_user
 from assets.dependencies import valid_asset_id, AssetServiceDep
-from database.models import Asset
+from database.models import Asset, User
 from assets.schemas import AssetCreate, AssetUpdate, AssetResponse, AssetPatchUpdate
 from pagination import PaginatorDep
 
@@ -36,6 +39,26 @@ async def get_specific_asset(asset: Asset = Depends(valid_asset_id)):
 @router.get("/search/", response_model=list[AssetResponse])
 async def search_assets(search_query: str, service: AssetServiceDep):
     return await service.search_assets(search_query)
+
+
+@router.post("/{asset_id}/buy/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
+async def buy_asset(
+    service: TransactionServiceDep,
+    asset: Asset = Depends(valid_asset_id),
+    amount: condecimal(gt=0, max_digits=20, decimal_places=10) = Body(...),
+    current_user: User = Depends(current_user),
+):
+    return await service.create_buy(asset, amount, current_user)
+
+
+@router.post("/{asset_id}/sell/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
+async def sell_asset(
+    service: TransactionServiceDep,
+    asset: Asset = Depends(valid_asset_id),
+    amount: condecimal(gt=0, max_digits=20, decimal_places=10) = Body(...),
+    current_user: User = Depends(current_user),
+):
+    return await service.create_sell(asset, amount, current_user)
 
 
 @router.put("/{asset_id}", response_model=AssetResponse, status_code=status.HTTP_200_OK)

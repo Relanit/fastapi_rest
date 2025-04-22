@@ -1,11 +1,13 @@
 from datetime import datetime, date
 from decimal import Decimal
+from enum import Enum
 from typing import Any, List, Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from pydantic import EmailStr
 from sqlalchemy import text, ForeignKey, String, DECIMAL, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy import Enum as SQLAlchemyEnum
 
 from database.database import Base, intpk
 
@@ -13,6 +15,11 @@ from database.database import Base, intpk
 USER_ROLE_ID = 1
 
 ADMIN_ROLE_ID = 2
+
+
+class TransactionType(Enum):
+    BUY = "buy"
+    SELL = "sell"
 
 
 class Role(Base):
@@ -90,7 +97,8 @@ class Transaction(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     asset_id: Mapped[int] = mapped_column(ForeignKey("asset.id"))
-    purchase_datetime: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
+    type: Mapped[TransactionType] = mapped_column(SQLAlchemyEnum(TransactionType))
+    transaction_datetime: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
     amount: Mapped[Decimal] = mapped_column(DECIMAL(precision=20, scale=10))  # Количество актива
     total_value: Mapped[Decimal] = mapped_column(
         DECIMAL(precision=20, scale=10)

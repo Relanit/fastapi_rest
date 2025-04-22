@@ -34,3 +34,10 @@ class AssetPatchUpdate(AssetBase):
 
 class AssetResponse(AssetBase):
     id: int
+
+
+class UserAssetResponse(BaseModel):
+    id: int
+    user_id: int
+    asset_id: int
+    amount: Decimal

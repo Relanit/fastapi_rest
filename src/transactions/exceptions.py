@@ -8,14 +8,6 @@ class UserNotFound(HTTPException):
         )
 
 
-class UserMismatch(HTTPException):
-    def __init__(self):
-        super().__init__(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"status": "error", "data": None, "details": "User id mismatched with current users"},
-        )
-
-
 class TransactionNotFound(HTTPException):
     def __init__(self):
         super().__init__(
@@ -37,4 +29,12 @@ class InsufficientFunds(HTTPException):
         super().__init__(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
             detail={"status": "error", "data": None, "details": "Not enough balance to buy selected asset amount"},
+        )
+
+
+class InsufficientAssets(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"status": "error", "data": None, "details": "You own fewer assets than you are trying to sell."},
         )

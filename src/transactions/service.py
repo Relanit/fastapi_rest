@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Sequence
 
 from fastapi import Depends
@@ -10,11 +11,11 @@ from transactions.exceptions import (
     AssetNotAvailable,
     TransactionNotFound,
     InsufficientFunds,
-    UserMismatch,
+    InsufficientAssets,
 )
-from transactions.schemas import TransactionCreate, TransactionUpdate, TransactionPatchUpdate
+from transactions.schemas import TransactionUpdate, TransactionPatchUpdate
 from database.database import get_async_session
-from database.models import User, Asset, Transaction, UserAsset
+from database.models import User, Asset, Transaction, UserAsset, TransactionType
 
 
 class TransactionService:
@@ -34,29 +35,70 @@ class TransactionService:
             return asset
         raise AssetNotFound()
 
-    async def create(self, transaction: TransactionCreate, user: User) -> Transaction:
-        asset = await self.valid_asset_id(transaction.asset_id)
+    async def create_buy(self, asset: Asset, amount: Decimal, user: User) -> Transaction:
         if asset.available_count <= 0:
             raise AssetNotAvailable()
 
-        total_value = transaction.amount * asset.price
+        total_value = amount * asset.price
 
         if user.balance < total_value:
             raise InsufficientFunds()
 
         user.balance -= total_value
-        asset.available_count -= transaction.amount
+        asset.available_count -= amount
 
         stmt = select(UserAsset).filter(UserAsset.user_id == user.id, UserAsset.asset_id == asset.id)
         user_asset = await self.session.scalar(stmt)
 
         if user_asset:
-            user_asset.amount += transaction.amount
+            user_asset.amount += amount
         else:
-            stmt = insert(UserAsset).values(user_id=user.id, asset_id=asset.id, amount=transaction.amount)
+            stmt = insert(UserAsset).values(user_id=user.id, asset_id=asset.id, amount=amount)
             await self.session.execute(stmt)
 
-        stmt = insert(Transaction).values(**transaction.model_dump(), user_id=user.id, total_value=total_value).returning(Transaction)
+        stmt = (
+            insert(Transaction)
+            .values(
+                amount=amount,
+                asset_id=asset.id,
+                user_id=user.id,
+                total_value=total_value,
+                type=TransactionType.BUY,
+            )
+            .returning(Transaction)
+        )
+        result = await self.session.execute(stmt)
+        await self.session.merge(user)
+        self.session.add(asset)
+        await self.session.commit()
+        return result.scalar_one()
+
+    async def create_sell(self, asset: Asset, amount: Decimal, user: User):
+        stmt = select(UserAsset).filter(UserAsset.user_id == user.id, UserAsset.asset_id == asset.id)
+        user_asset = await self.session.scalar(stmt)
+        if not user_asset or user_asset.amount < amount:
+            raise InsufficientAssets()
+
+        total_value = amount * asset.price
+        user.balance += total_value
+        asset.available_count += amount
+
+        if amount == user_asset.amount:
+            await self.session.delete(user_asset)
+        else:
+            user_asset.amount -= amount
+
+        stmt = (
+            insert(Transaction)
+            .values(
+                amount=amount,
+                asset_id=asset.id,
+                user_id=user.id,
+                total_value=total_value,
+                type=TransactionType.SELL,
+            )
+            .returning(Transaction)
+        )
         result = await self.session.execute(stmt)
         await self.session.merge(user)
         self.session.add(asset)
