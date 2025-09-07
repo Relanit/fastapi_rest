@@ -7,7 +7,7 @@ from .manager import get_user_manager
 from database.models import User, ADMIN_ROLE_ID
 from config import config
 
-cookie_transport = CookieTransport(cookie_name="library", cookie_max_age=3600)
+cookie_transport = CookieTransport(cookie_name="invest-app", cookie_max_age=3600)
 
 
 def get_jwt_strategy() -> JWTStrategy:

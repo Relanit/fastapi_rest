@@ -67,9 +67,9 @@ async def test_login(client: AsyncClient):
         },
     )
 
-    token = response.cookies.get("library")
+    token = response.cookies.get("invest-app")
     assert response.status_code == status.HTTP_204_NO_CONTENT
-    client.cookies.set("library", token)
+    client.cookies.set("invest-app", token)
 
 
 @pytest.mark.dependency(depends=["test_register"])
@@ -88,4 +88,4 @@ async def test_bad_login(client: AsyncClient):
 async def test_logout(client: AsyncClient):
     response = await client.post("/auth/jwt/logout")
     assert response.status_code == status.HTTP_204_NO_CONTENT
-    client.cookies.delete("library")
+    client.cookies.delete("invest-app")
