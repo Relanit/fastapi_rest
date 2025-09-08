@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
-from config import Config
+from config import config as cfg
 from database.models import *
 
 # this is the Alembic Config object, which provides
@@ -13,7 +13,6 @@ config = context.config
 
 section = config.config_ini_section
 
-cfg = Config()
 config.set_section_option(section, "POSTGRES_USER", cfg.POSTGRES_USER)
 config.set_section_option(section, "POSTGRES_PASSWORD", cfg.POSTGRES_PASSWORD)
 config.set_section_option(section, "POSTGRES_HOST", cfg.POSTGRES_HOST)

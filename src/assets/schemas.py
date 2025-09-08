@@ -11,7 +11,7 @@ class AssetBase(BaseModel):
     ticker: str
     description: str | None = None
     available_count: conint(ge=0)
-    price: condecimal(gt=0, max_digits=10, decimal_places=2)
+    price: condecimal(gt=0, max_digits=30, decimal_places=20)
 
 
 class AssetCreate(AssetBase):

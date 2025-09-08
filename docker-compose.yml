@@ -3,17 +3,23 @@ services:
     image: postgres:17
     container_name: db_fastapi_rest
     command: -p 2222
-    expose:
-      - "2222"
+    ports:
+      - "2222:2222"
     env_file:
       - .env.prod
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h db -p 2222" ]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+
 
   test_db:
     image: postgres:17
     container_name: test_db_fastapi_rest
     command: -p 5433
-    expose:
-      - "5433"
     env_file:
       - .env.test
 
@@ -21,8 +27,10 @@ services:
     image: redis:7
     container_name: redis_fastapi_rest
     command: --port 5370
-    expose:
-      - "5370"
+    ports:
+      - "5370:5370"
+    volumes:
+      - redis_data:/data
 
   app:
     build:
@@ -36,8 +44,13 @@ services:
     ports:
       - "9999:8000"
     depends_on:
-      - db
-      - redis
-      - test_db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     volumes:
       - .:/fastapi_rest
+
+volumes:
+  pg_data:
+  redis_data:

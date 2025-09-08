@@ -29,6 +29,8 @@ class Config(BaseSettings):
     USE_CREDENTIALS: bool = True
     VALIDATE_CERTS: bool = True
 
+    FINNHUB_API_KEY: str
+
     model_config = ConfigDict(
         env_file=Path("") if os.getenv("DOCKER_ENV", "").lower() == "true" else ".env.dev", env_file_encoding="utf-8"
     )
