@@ -51,6 +51,38 @@ services:
     volumes:
       - .:/fastapi_rest
 
+  celery_worker:
+    build:
+      context: .
+    container_name: celery_worker_fastapi
+    command: ["celery", "-A", "tasks", "worker", "-l", "info"]
+    working_dir: /fastapi_rest/src
+    volumes:
+      - .:/fastapi_rest
+    env_file:
+      - .env.prod
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  celery_beat:
+    build:
+      context: .
+    container_name: celery_beat_fastapi
+    command: ["celery", "-A", "tasks", "beat", "-l", "info"]
+    working_dir: /fastapi_rest/src
+    volumes:
+      - .:/fastapi_rest
+    env_file:
+      - .env.prod
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
 volumes:
   pg_data:
   redis_data:
