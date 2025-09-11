@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.database import get_async_session
-from database.models import Transaction, Asset, UserAsset
+from database.models import Transaction, UserAsset
 
 
 class UserService:

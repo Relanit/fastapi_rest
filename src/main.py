@@ -7,6 +7,7 @@ from fastapi_cache.backends.redis import RedisBackend
 from fastapi.middleware.cors import CORSMiddleware
 from redis import asyncio as aioredis
 
+from database.database import setup_database, dispose_database_engine
 from users.auth import auth_backend, fastapi_users
 from config import config
 from users.schemas import UserRead, UserCreate
@@ -20,9 +21,11 @@ from users.router import router as users_router
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    setup_database()
     redis = aioredis.from_url(f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
+    await dispose_database_engine()
 
 
 app = FastAPI(title="Invest app", lifespan=lifespan)
