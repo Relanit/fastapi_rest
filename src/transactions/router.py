@@ -1,8 +1,12 @@
-from fastapi import APIRouter, Depends
-from fastapi import status
+from fastapi import status, Request, APIRouter, Depends
 
+from limiter import limiter
 from users.auth import current_user_admin
-from transactions.schemas import TransactionResponse, TransactionUpdate, TransactionPatchUpdate
+from transactions.schemas import (
+    TransactionResponse,
+    TransactionUpdate,
+    TransactionPatchUpdate,
+)
 from transactions.dependencies import TransactionServiceDep, valid_transaction_id
 from database.models import Transaction, User
 from pagination import PaginatorDep
@@ -11,8 +15,12 @@ from pagination import PaginatorDep
 router = APIRouter(prefix="/transactions", tags=["Transaction"])
 
 
-@router.get("/", response_model=list[TransactionResponse], status_code=status.HTTP_200_OK)
+@router.get(
+    "/", response_model=list[TransactionResponse], status_code=status.HTTP_200_OK
+)
+@limiter.limit("5/minute")
 async def get_transactions(
+    request: Request,
     pagination: PaginatorDep,
     service: TransactionServiceDep,
     current_user_admin: User = Depends(current_user_admin),
@@ -20,14 +28,25 @@ async def get_transactions(
     return await service.get_all(pagination.limit, pagination.skip)
 
 
-@router.get("/{transaction_id}", response_model=TransactionResponse, status_code=status.HTTP_200_OK)
+@router.get(
+    "/{transaction_id}",
+    response_model=TransactionResponse,
+    status_code=status.HTTP_200_OK,
+)
+@limiter.limit("5/minute")
 async def get_specific_transaction(
-    transaction: Transaction = Depends(valid_transaction_id), current_user_admin=Depends(current_user_admin)
+    request: Request,
+    transaction: Transaction = Depends(valid_transaction_id),
+    current_user_admin=Depends(current_user_admin),
 ):
     return transaction
 
 
-@router.put("/{transaction_id}", response_model=TransactionResponse, status_code=status.HTTP_200_OK)
+@router.put(
+    "/{transaction_id}",
+    response_model=TransactionResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def update_transaction(
     updated_transaction: TransactionUpdate,
     service: TransactionServiceDep,
@@ -37,7 +56,11 @@ async def update_transaction(
     return await service.update_full(transaction, updated_transaction)
 
 
-@router.patch("/{transaction_id}", response_model=TransactionResponse, status_code=status.HTTP_200_OK)
+@router.patch(
+    "/{transaction_id}",
+    response_model=TransactionResponse,
+    status_code=status.HTTP_200_OK,
+)
 async def partial_update_transaction(
     transaction_data: TransactionPatchUpdate,
     service: TransactionServiceDep,

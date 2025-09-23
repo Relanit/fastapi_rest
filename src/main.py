@@ -6,8 +6,11 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi.middleware.cors import CORSMiddleware
 from redis import asyncio as aioredis
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from database.database import setup_database, dispose_database_engine
+from limiter import limiter
 from users.auth import auth_backend, fastapi_users
 from config import config
 from users.schemas import UserRead, UserCreate
@@ -29,6 +32,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Invest app", lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 origins = ["http://localhost:3000"]
 

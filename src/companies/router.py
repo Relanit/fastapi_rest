@@ -1,9 +1,14 @@
-from fastapi import APIRouter, Depends
-from fastapi import status
+from fastapi import status, Request, APIRouter, Depends
 
+from limiter import limiter
 from users.auth import current_user_admin
 from companies.dependencies import valid_company_id, CompanyServiceDep
-from companies.schemas import CompanyCreate, CompanyUpdate, CompanyResponse, CompanyPatchUpdate
+from companies.schemas import (
+    CompanyCreate,
+    CompanyUpdate,
+    CompanyResponse,
+    CompanyPatchUpdate,
+)
 from database.models import Company
 from pagination import PaginatorDep
 
@@ -20,16 +25,26 @@ async def create_company(
 
 
 @router.get("/", response_model=list[CompanyResponse], status_code=status.HTTP_200_OK)
-async def get_companies(pagination: PaginatorDep, service: CompanyServiceDep):
+@limiter.limit("5/minute")
+async def get_companies(
+    request: Request, pagination: PaginatorDep, service: CompanyServiceDep
+):
     return await service.get_all(pagination.limit, pagination.skip)
 
 
-@router.get("/{company_id}", response_model=CompanyResponse, status_code=status.HTTP_200_OK)
-async def get_specific_company(company: Company = Depends(valid_company_id)):
+@router.get(
+    "/{company_id}", response_model=CompanyResponse, status_code=status.HTTP_200_OK
+)
+@limiter.limit("5/minute")
+async def get_specific_company(
+    request: Request, company: Company = Depends(valid_company_id)
+):
     return company
 
 
-@router.put("/{company_id}", response_model=CompanyResponse, status_code=status.HTTP_200_OK)
+@router.put(
+    "/{company_id}", response_model=CompanyResponse, status_code=status.HTTP_200_OK
+)
 async def update_company(
     updated_company: CompanyUpdate,
     service: CompanyServiceDep,
@@ -39,7 +54,9 @@ async def update_company(
     return await service.update_full(company, updated_company)
 
 
-@router.patch("/{company_id}", response_model=CompanyResponse, status_code=status.HTTP_200_OK)
+@router.patch(
+    "/{company_id}", response_model=CompanyResponse, status_code=status.HTTP_200_OK
+)
 async def partial_update_company(
     company_data: CompanyPatchUpdate,
     service: CompanyServiceDep,
