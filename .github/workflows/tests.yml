@@ -1,0 +1,66 @@
+name: CI - tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create .env.test from env vars + secrets
+        run: |
+          cat > .env.test <<'EOF'
+          POSTGRES_HOST=${{ vars.POSTGRES_HOST }}
+          POSTGRES_PORT=${{ vars.POSTGRES_PORT }}
+          POSTGRES_DB=${{ vars.POSTGRES_DB }}
+          POSTGRES_USER=${{ vars.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          REDIS_HOST=${{ secrets.REDIS_HOST }}
+          REDIS_PORT=${{ secrets.REDIS_PORT }}
+          SECRET=${{ secrets.APP_SECRET }}
+          DEBUG=${{ secrets.DEBUG }}
+          FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}
+          EOF
+
+      - name: Set up Docker buildx (optional, speeds builds)
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build app image
+        run: docker compose build app
+
+      - name: Start test DB and redis
+        run: docker compose up -d test_db redis
+
+      - name: Run pytest inside app container
+        # запускаем pytest внутри контейнера app, он имеет доступ к сети docker-compose
+        run: |
+          docker compose run --rm --env-file .env.test app sh -c ' \
+            echo "Waiting for Postgres on $POSTGRES_HOST:$POSTGRES_PORT"; \
+            i=0; \
+            until pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" > /dev/null 2>&1 || [ $i -ge 60 ]; do \
+              i=$((i+1)); sleep 1; \
+            done; \
+            if ! pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" > /dev/null 2>&1; then \
+              echo "Postgres did not become ready"; exit 1; \
+            fi; \
+            pytest -v \
+          '
+
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          echo "=== docker ps ==="
+          docker ps -a
+          echo "=== docker logs test_db_fastapi_rest (if exists) ==="
+          docker logs test_db_fastapi_rest || true
+          echo "=== docker logs test_db_fastapi_rest (container from compose) ==="
+          docker compose logs test_db || true
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
