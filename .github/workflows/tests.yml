@@ -38,17 +38,17 @@ jobs:
 
       - name: Run pytest inside app container
         run: |
-          docker compose run --rm app sh -c '\
-            export POSTGRES_HOST=${POSTGRES_HOST}; \
-            export POSTGRES_PORT=${POSTGRES_PORT}; \
-            export POSTGRES_DB=${POSTGRES_DB}; \
-            export POSTGRES_USER=${POSTGRES_USER}; \
-            export POSTGRES_PASSWORD=${POSTGRES_PASSWORD}; \
-            export REDIS_HOST=${REDIS_HOST}; \
-            export REDIS_PORT=${REDIS_PORT}; \
-            export SECRET=${SECRET}; \
-            export DEBUG=${DEBUG}; \
-            export FINNHUB_API_KEY=${FINNHUB_API_KEY}; \
+          set -a
+          source .env.test
+          set +a
+
+          env_args=$(awk -F= '/^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*=/ {
+            key=$1; sub(/^[ \t]*/,"",key); sub(/[ \t]*$/,"",key);
+            val=$0; sub(/^[^=]*=/,"",val); sub(/^[ \t]*/,"",val); gsub(/"/,"\\\"",val);
+            printf " -e %s=\"%s\"", key, val
+          }' .env.test)
+
+          docker compose run --rm $env_args app sh -c '\
             echo "Waiting for Postgres on $POSTGRES_HOST:$POSTGRES_PORT"; \
             i=0; \
             until pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" > /dev/null 2>&1 || [ $i -ge 60 ]; do \
@@ -58,6 +58,7 @@ jobs:
               echo "Postgres did not become ready"; exit 1; \
             fi; \
             pytest -v'
+
 
       - name: Collect logs on failure
         if: failure()
