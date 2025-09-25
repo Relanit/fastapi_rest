@@ -37,9 +37,18 @@ jobs:
         run: docker compose up -d test_db redis
 
       - name: Run pytest inside app container
-        # запускаем pytest внутри контейнера app, он имеет доступ к сети docker-compose
         run: |
-          docker compose run --rm --env-file .env.test app sh -c ' \
+          docker compose run --rm app sh -c '\
+            export POSTGRES_HOST=${POSTGRES_HOST}; \
+            export POSTGRES_PORT=${POSTGRES_PORT}; \
+            export POSTGRES_DB=${POSTGRES_DB}; \
+            export POSTGRES_USER=${POSTGRES_USER}; \
+            export POSTGRES_PASSWORD=${POSTGRES_PASSWORD}; \
+            export REDIS_HOST=${REDIS_HOST}; \
+            export REDIS_PORT=${REDIS_PORT}; \
+            export SECRET=${SECRET}; \
+            export DEBUG=${DEBUG}; \
+            export FINNHUB_API_KEY=${FINNHUB_API_KEY}; \
             echo "Waiting for Postgres on $POSTGRES_HOST:$POSTGRES_PORT"; \
             i=0; \
             until pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" > /dev/null 2>&1 || [ $i -ge 60 ]; do \
@@ -48,8 +57,7 @@ jobs:
             if ! pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" > /dev/null 2>&1; then \
               echo "Postgres did not become ready"; exit 1; \
             fi; \
-            pytest -v \
-          '
+            pytest -v'
 
       - name: Collect logs on failure
         if: failure()
