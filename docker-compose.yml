@@ -36,7 +36,6 @@ services:
     build:
       context: .
     environment:
-      - DOCKER_ENV=true
       - HTTP_PROXY=http://host.docker.internal:10808
       - HTTPS_PROXY=http://host.docker.internal:10808
       - NO_PROXY=localhost,127.0.0.1,db,redis

@@ -1,7 +1,3 @@
-import os
-from pathlib import Path
-
-from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -30,10 +26,6 @@ class Config(BaseSettings):
     VALIDATE_CERTS: bool = True
 
     FINNHUB_API_KEY: str
-
-    model_config = ConfigDict(
-        env_file=Path("") if os.getenv("DOCKER_ENV", "").lower() == "true" else ".env.dev", env_file_encoding="utf-8"
-    )
 
 
 config = Config()
